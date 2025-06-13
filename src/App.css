@@ -1,0 +1,149 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+:root {
+  --mantine-color-gray-0: #f8f9fa;
+  --mantine-color-gray-1: #f1f3f5;
+  --mantine-color-gray-2: #e9ecef;
+  --mantine-color-blue-6: #228be6;
+  --mantine-color-blue-7: #1c7ed6;
+  --mantine-radius-md: 8px;
+  --mantine-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+body {
+  background-color: var(--mantine-color-gray-0);
+  color: #1a1b1e;
+}
+
+.mantine-Paper-root {
+  background-color: white;
+  border: 1px solid var(--mantine-color-gray-2);
+  box-shadow: var(--mantine-shadow-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mantine-Paper-root:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.mantine-Button-root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  padding: 12px 20px;
+  border-radius: var(--mantine-radius-md);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  height: 48px;
+}
+
+.mantine-Button-filled {
+  background-color: var(--mantine-color-blue-6);
+  color: white;
+}
+
+.mantine-Button-filled:hover {
+  background-color: var(--mantine-color-blue-7);
+}
+
+.mantine-Button-light {
+  background-color: #e7f5ff;
+  color: var(--mantine-color-blue-6);
+}
+
+.mantine-Button-light:hover {
+  background-color: #d0ebff;
+}
+
+.mantine-Button-subtle {
+  background-color: transparent;
+  color: #868e96;
+}
+
+.mantine-Button-subtle:hover {
+  background-color: var(--mantine-color-gray-1);
+}
+
+.mantine-Button-red {
+  color: #fa5252;
+}
+
+.mantine-Button-red:hover {
+  background-color: #fff5f5;
+}
+
+.mantine-NumberInput-input,
+.mantine-Select-input {
+  height: 48px;
+  font-size: 1rem;
+  border-color: var(--mantine-color-gray-2);
+  transition: all 0.2s ease;
+}
+
+.mantine-NumberInput-input:focus,
+.mantine-Select-input:focus {
+  border-color: var(--mantine-color-blue-6);
+  box-shadow: 0 0 0 2px rgba(34, 139, 230, 0.1);
+}
+
+@media (min-width: 1440px) {
+  .mantine-Container-root {
+    max-width: 1200px !important;
+  }
+
+  .mantine-Title-root {
+    font-size: 2.5rem !important;
+  }
+
+  .mantine-Button-root {
+    font-size: 1.125rem;
+  }
+
+  .mantine-NumberInput-input,
+  .mantine-Select-input {
+    font-size: 1.125rem;
+  }
+}
