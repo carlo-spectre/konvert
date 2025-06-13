@@ -1,4 +1,3 @@
-import React from 'react'
 import { MantineProvider, Box, Title, createTheme, Group } from '@mantine/core'
 import CurrencyConverter from './components/CurrencyConverter'
 import Calculator from './components/Calculator'
