@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Box, Button, Group, Stack, Text, ScrollArea } from '@mantine/core';
 
 interface HistoryItem {
@@ -11,6 +11,8 @@ const Calculator = () => {
   const [display, setDisplay] = useState('0');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [lastOperation, setLastOperation] = useState<string | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const calculatorRef = useRef<HTMLDivElement>(null);
 
   const handleNumber = (num: string) => {
     setDisplay(prev => prev === '0' ? num : prev + num);
@@ -93,12 +95,13 @@ const Calculator = () => {
   // Add keyboard event handler
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle keyboard events if calculator is focused
+      if (!isFocused) return;
+
       // Prevent default behavior for these keys to avoid unwanted scrolling
       if (['+', '-', '*', '/', 'Enter', '=', 'c', 'C'].includes(event.key)) {
         event.preventDefault();
       }
-
-      console.log('Key pressed:', event.key);
 
       // Numbers (both number row and numpad)
       if (/^[0-9]$/.test(event.key)) {
@@ -123,7 +126,6 @@ const Calculator = () => {
       }
       // Enter/Return for equals
       else if (event.key === 'Enter' || event.key === 'Return') {
-        console.log('Enter pressed, current display:', display);
         handleEquals();
       }
       // Backspace for delete
@@ -138,18 +140,27 @@ const Calculator = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [display]); // Add display to dependencies since we use it in the handler
+  }, [display, isFocused]); // Add isFocused to dependencies
 
   return (
     <Group align="flex-start" gap="xl" wrap="nowrap">
       <Box
+        ref={calculatorRef}
+        tabIndex={0}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         style={{
           background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
           backdropFilter: 'blur(10px)',
           borderRadius: '16px',
           padding: '24px',
           border: '1px solid rgba(255,255,255,0.1)',
-          width: '320px'
+          width: '320px',
+          outline: 'none',
+          transition: 'all 0.3s ease',
+          '&:focus': {
+            boxShadow: '0 0 0 2px rgba(0, 255, 255, 0.5)',
+          },
         }}
       >
         {/* Display */}

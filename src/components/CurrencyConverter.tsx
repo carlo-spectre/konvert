@@ -153,13 +153,24 @@ const CurrencyConverter = () => {
     });
   };
 
-  const handleBaseAmountChange = (value: string | number) => {
+  const handleAmountChange = (value: string | number, index: number) => {
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
     if (isNaN(numValue)) return;
     
     const newRows = [...rows];
-    newRows[0] = { ...newRows[0], amount: numValue };
-    setRows(updateConversions(newRows));
+    newRows[index] = { ...newRows[index], amount: numValue };
+
+    // If changing base amount
+    if (index === 0) {
+      setRows(updateConversions(newRows));
+    } else {
+      // If changing other amounts, reverse calculate the base amount
+      const targetCurrency = newRows[index].currency;
+      const baseCurrency = newRows[0].currency;
+      const newBaseAmount = calculateAmount(numValue, targetCurrency, baseCurrency, rates);
+      newRows[0] = { ...newRows[0], amount: newBaseAmount };
+      setRows(updateConversions(newRows));
+    }
   };
 
   const handleCurrencyChange = (value: string | null, index: number) => {
@@ -208,141 +219,62 @@ const CurrencyConverter = () => {
   }
 
   return (
-    <Box
-      style={{
-        background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: '16px',
-        padding: '24px',
-        border: '1px solid rgba(255,255,255,0.1)',
-        overflow: 'hidden',
-      }}
-    >
-      <Group grow>
-        <Select
-          data={CURRENCIES}
-          value={rows[0].currency}
-          onChange={(val) => handleCurrencyChange(val, 0)}
-          rightSectionWidth={0}
-          comboboxProps={{ withinPortal: true }}
-          styles={{
-            input: {
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'white',
-              fontSize: '14px',
-            },
-            section: { display: 'none' }
-          }}
-        />
-        <NumberInput
-          value={rows[0].amount}
-          onChange={handleBaseAmountChange}
-          min={0}
-          hideControls
-          thousandSeparator=","
-          styles={{
-            input: {
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'white',
-              fontSize: '14px',
-            }
-          }}
-        />
-      </Group>
-
-      <Divider
-        my="lg"
-        variant="dashed"
-        style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-        label={<Text c="dimmed">Added Currencies</Text>}
-        labelPosition="center"
-      />
-
+    <Box style={containerStyles}>
       <Stack gap="md">
-        {rows.slice(1).map((row, index) => (
-          <Group key={row.id} style={{ alignItems: 'center' }}>
+        {rows.map((row, index) => (
+          <Group key={row.id} style={rowStyles} align="flex-end">
             <Box style={{ flex: 1 }}>
-              <Group grow>
-                <Select
-                  data={CURRENCIES.filter(c => c.value !== rows[0].currency)}
-                  value={row.currency}
-                  onChange={(value) => handleCurrencyChange(value, index + 1)}
-                  rightSectionWidth={0}
-                  comboboxProps={{ withinPortal: true }}
-                  styles={{
-                    input: {
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      color: 'white',
-                      fontSize: '14px',
-                    },
-                    section: { display: 'none' }
-                  }}
-                />
-                <NumberInput
-                  value={row.amount}
-                  readOnly
-                  hideControls
-                  thousandSeparator=","
-                  styles={{
-                    input: {
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      color: 'white',
-                      fontSize: '14px',
-                    }
-                  }}
-                />
-              </Group>
+              <Select
+                label="Currency"
+                value={row.currency}
+                onChange={(value) => handleCurrencyChange(value, index)}
+                data={CURRENCIES.filter(c => 
+                  c.value === row.currency || 
+                  !rows.some(r => r.currency === c.value)
+                )}
+                styles={inputStyles}
+              />
             </Box>
-            <ActionIcon
-              variant="subtle"
-              color="red"
-              onClick={() => removeCurrency(index + 1)}
-              style={{ 
-                background: 'rgba(255,0,0,0.1)',
-                borderRadius: '8px',
-                marginLeft: '8px',
-              }}
-            >
-              <IconTrash size={16} />
-            </ActionIcon>
+            <Box style={{ flex: 1 }}>
+              <NumberInput
+                label="Amount"
+                value={row.amount}
+                onChange={(value) => handleAmountChange(value, index)}
+                decimalScale={CRYPTO_CURRENCIES.includes(row.currency) ? 8 : 2}
+                min={0}
+                styles={inputStyles}
+              />
+            </Box>
+            {index > 1 && (
+              <ActionIcon
+                color="red"
+                variant="subtle"
+                onClick={() => removeCurrency(index)}
+                style={{ marginBottom: '4px' }}
+              >
+                <IconTrash size={20} />
+              </ActionIcon>
+            )}
           </Group>
         ))}
-      </Stack>
-
-      {rows.length < 10 && (
-        <Button
-          fullWidth
-          mt="lg"
-          onClick={addCurrency}
-          leftSection={<IconPlus size={16} style={{ color: 'rgba(255, 82, 82, 1)' }} />}
-          variant="subtle"
-          style={{
-            background: 'rgba(255, 82, 82, 0.05)',
-            border: '1px solid rgba(255, 82, 82, 0.2)',
-            transition: 'all 0.2s ease',
-            color: 'rgba(255, 82, 82, 0.8)',
-            fontWeight: 500,
-            height: '42px',
-            fontSize: '14px',
-            borderRadius: '8px',
-          }}
-          styles={{
-            root: {
+        
+        {rows.length < CURRENCIES.length && (
+          <Button
+            leftSection={<IconPlus size={20} />}
+            variant="subtle"
+            onClick={addCurrency}
+            style={{
+              backgroundColor: 'rgba(0, 255, 255, 0.1)',
+              color: '#00ffff',
               '&:hover': {
-                background: 'rgba(255, 82, 82, 0.1)',
-                border: '1px solid rgba(255, 82, 82, 0.3)',
-                transform: 'translateY(-1px)'
+                backgroundColor: 'rgba(0, 255, 255, 0.2)',
               }
-            }
-          }}
-        >
-          Add Currency
-        </Button>
-      )}
+            }}
+          >
+            Add Currency
+          </Button>
+        )}
+      </Stack>
     </Box>
   );
 };
