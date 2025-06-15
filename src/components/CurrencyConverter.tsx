@@ -219,7 +219,7 @@ const CurrencyConverter = () => {
   };
 
   const removeCurrency = (index: number) => {
-    if (index === 0 || rows.length <= 2) return;
+    if (index === 0) return; // Only prevent deleting the base currency
     const newRows = rows.filter((_, i) => i !== index);
     setRows(updateConversions(newRows));
   };
@@ -271,7 +271,7 @@ const CurrencyConverter = () => {
                 styles={index === 0 ? baseInputStyles : inputStyles}
               />
             </Box>
-            {index > 1 && (
+            {index > 0 && ( // Show delete button for all rows except base currency
               <ActionIcon
                 color="red"
                 variant="subtle"
