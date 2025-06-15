@@ -32,7 +32,7 @@ const containerStyles = {
 const rowStyles = {
   background: 'rgba(255, 255, 255, 0.02)',
   borderRadius: '12px',
-  padding: '16px',
+  padding: '12px',
   transition: 'all 0.2s ease',
   '&:hover': {
     background: 'rgba(255, 255, 255, 0.03)',
@@ -64,7 +64,28 @@ const inputStyles = {
       backgroundColor: 'rgba(0, 0, 0, 0.15)',
       color: 'rgba(255, 255, 255, 0.9)',
       border: '1px solid rgba(255, 255, 255, 0.03)'
+    },
+    '&::-webkit-inner-spin-button, &::-webkit-outer-spin-button': {
+      '-webkit-appearance': 'none',
+      margin: 0
+    },
+    '&[type=number]': {
+      '-moz-appearance': 'textfield'
     }
+  }
+};
+
+const baseInputStyles = {
+  ...inputStyles,
+  label: {
+    ...inputStyles.label,
+    fontSize: '1rem',
+    marginBottom: '12px'
+  },
+  input: {
+    ...inputStyles.input,
+    height: '48px',
+    fontSize: '1.1rem'
   }
 };
 
@@ -224,27 +245,30 @@ const CurrencyConverter = () => {
     <Box style={containerStyles}>
       <Stack gap="md">
         {rows.map((row, index) => (
-          <Group key={row.id} style={rowStyles} align="flex-end">
+          <Group key={row.id} style={rowStyles} align="center">
             <Box style={{ flex: 1 }}>
               <Select
-                label="Currency"
+                label={index === 0 ? "Base Currency" : undefined}
+                placeholder={index === 0 ? undefined : "Select currency"}
                 value={row.currency}
                 onChange={(value) => handleCurrencyChange(value, index)}
                 data={CURRENCIES.filter(c => 
                   c.value === row.currency || 
                   !rows.some(r => r.currency === c.value)
                 )}
-                styles={inputStyles}
+                styles={index === 0 ? baseInputStyles : inputStyles}
               />
             </Box>
             <Box style={{ flex: 1 }}>
               <NumberInput
-                label="Amount"
+                label={index === 0 ? "Amount" : undefined}
+                placeholder={index === 0 ? undefined : "Amount"}
                 value={row.amount}
                 onChange={(value) => handleAmountChange(value, index)}
                 decimalScale={CRYPTO_CURRENCIES.includes(row.currency) ? 8 : 2}
                 min={0}
-                styles={inputStyles}
+                hideControls
+                styles={index === 0 ? baseInputStyles : inputStyles}
               />
             </Box>
             {index > 1 && (
@@ -252,7 +276,7 @@ const CurrencyConverter = () => {
                 color="red"
                 variant="subtle"
                 onClick={() => removeCurrency(index)}
-                style={{ marginBottom: '4px' }}
+                style={{ marginTop: index === 0 ? '32px' : 0 }}
               >
                 <IconTrash size={20} />
               </ActionIcon>
