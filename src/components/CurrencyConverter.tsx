@@ -13,6 +13,7 @@ const CURRENCIES = [
   { label: 'Ethereum (ETH)', value: 'ETH' },
   { label: 'Solana (SOL)', value: 'SOL' },
   { label: 'Australian Dollar (AUD)', value: 'AUD' },
+  { label: 'New Zealand Dollar (NZD)', value: 'NZD' },
   { label: 'Canadian Dollar (CAD)', value: 'CAD' },
   { label: 'Swiss Franc (CHF)', value: 'CHF' },
 ];
@@ -123,6 +124,7 @@ const CurrencyConverter = () => {
         ETH: 0.00037,
         SOL: 0.0137,
         AUD: 1.52,
+        NZD: 1.65,
         CAD: 1.35,
         CHF: 0.88,
       });
