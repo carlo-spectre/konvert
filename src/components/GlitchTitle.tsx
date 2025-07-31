@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { useMediaQuery } from '@mantine/hooks';
 
 interface GlitchTitleProps {
   text: string;
@@ -8,6 +9,7 @@ interface GlitchTitleProps {
 
 const GlitchTitle = ({ text }: GlitchTitleProps) => {
   const [isGlitching, setIsGlitching] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
     const glitchInterval = setInterval(() => {
@@ -40,11 +42,11 @@ const GlitchTitle = ({ text }: GlitchTitleProps) => {
       <Title
         ta="center"
         style={{
-          fontSize: '4rem',
+          fontSize: isMobile ? '2.5rem' : '4rem',
           fontFamily: '"Orbitron", sans-serif',
           color: '#fff',
           textTransform: 'uppercase',
-          letterSpacing: '0.2em',
+          letterSpacing: isMobile ? '0.1em' : '0.2em',
         }}
       >
         {text}
@@ -67,10 +69,10 @@ const GlitchTitle = ({ text }: GlitchTitleProps) => {
             <Title
               ta="center"
               style={{
-                fontSize: '4rem',
+                fontSize: isMobile ? '2.5rem' : '4rem',
                 fontFamily: '"Orbitron", sans-serif',
                 textTransform: 'uppercase',
-                letterSpacing: '0.2em',
+                letterSpacing: isMobile ? '0.1em' : '0.2em',
               }}
             >
               {text}
@@ -92,10 +94,10 @@ const GlitchTitle = ({ text }: GlitchTitleProps) => {
             <Title
               ta="center"
               style={{
-                fontSize: '4rem',
+                fontSize: isMobile ? '2.5rem' : '4rem',
                 fontFamily: '"Orbitron", sans-serif',
                 textTransform: 'uppercase',
-                letterSpacing: '0.2em',
+                letterSpacing: isMobile ? '0.1em' : '0.2em',
               }}
             >
               {text}
