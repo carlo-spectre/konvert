@@ -71,6 +71,38 @@ const App = () => {
 
   return (
     <MantineProvider theme={theme}>
+      <style>
+        {`
+          /* Target ALL possible elements that could have borders */
+          .mantine-Tabs-panel,
+          .mantine-Tabs-root,
+          .mantine-Tabs-list,
+          .mantine-Tabs-tab,
+          [data-mantine-tabs-panel],
+          [data-mantine-tabs-list],
+          [data-mantine-tabs-tab],
+          .mantine-Tabs-panel *,
+          .mantine-Tabs-root *,
+          .mantine-Tabs-list * {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+          }
+          
+          /* Remove any pseudo-elements that might be causing borders */
+          .mantine-Tabs-list::before,
+          .mantine-Tabs-list::after,
+          .mantine-Tabs-panel::before,
+          .mantine-Tabs-panel::after {
+            display: none !important;
+          }
+          
+          /* Keep only the active tab indicator */
+          .mantine-Tabs-tab[data-active] {
+            border-bottom: 2px solid #00ffff !important;
+          }
+        `}
+      </style>
       <Box 
         bg="black" 
         style={{ 
@@ -93,17 +125,31 @@ const App = () => {
           
           {isMobile ? (
             // Mobile layout with tabs
-            <Tabs defaultValue="converter" style={{ marginTop: '2rem' }}>
-              <Tabs.List 
-                style={{ 
+            <Tabs 
+              defaultValue="converter" 
+              style={{ marginTop: '2rem' }}
+              styles={{
+                panel: {
+                  border: 'none !important',
+                  background: 'transparent !important',
+                  boxShadow: 'none !important',
+                  outline: 'none !important',
+                },
+                list: {
                   justifyContent: 'center',
                   marginBottom: '2rem',
                   background: 'rgba(255, 255, 255, 0.05)',
                   borderRadius: '12px',
                   padding: '4px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                }}
-              >
+                  border: 'none',
+                },
+                root: {
+                  border: 'none !important',
+                  outline: 'none !important',
+                }
+              }}
+            >
+              <Tabs.List>
                 <Tabs.Tab 
                   value="converter"
                   style={{
