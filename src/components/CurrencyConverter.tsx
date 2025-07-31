@@ -9,6 +9,8 @@ const CURRENCIES = [
   { label: 'Japanese Yen (JPY)', value: 'JPY' },
   { label: 'Hong Kong Dollar (HKD)', value: 'HKD' },
   { label: 'Philippine Peso (PHP)', value: 'PHP' },
+  { label: 'Malaysian Ringgit (MYR)', value: 'MYR' },
+  { label: 'Singapore Dollar (SGD)', value: 'SGD' },
   { label: 'Bitcoin (BTC)', value: 'BTC' },
   { label: 'Ethereum (ETH)', value: 'ETH' },
   { label: 'Solana (SOL)', value: 'SOL' },
@@ -96,11 +98,19 @@ interface CurrencyRow {
 }
 
 const CurrencyConverter = () => {
+  // Simple formatter for display
+  const formatDisplay = (value: number) => {
+    return value.toLocaleString('en-US', { 
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 8 
+    });
+  };
+
   const [rows, setRows] = useState<CurrencyRow[]>([
     { id: '1', currency: 'HKD', amount: 1 },
     { id: '2', currency: 'USD', amount: 0 },
     { id: '3', currency: 'PHP', amount: 0 },
-    { id: '4', currency: 'JPY', amount: 0 },
+    { id: '4', currency: 'MYR', amount: 0 },
   ]);
   const [rates, setRates] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -143,6 +153,8 @@ const CurrencyConverter = () => {
         JPY: 148.41,
         HKD: 7.82,
         PHP: 55.67,
+        MYR: 4.75,
+        SGD: 1.35,
         BTC: 0.000023,
         ETH: 0.00037,
         SOL: 0.0137,
@@ -270,15 +282,45 @@ const CurrencyConverter = () => {
             />
           </Box>
           <Box style={{ flex: 1 }}>
-            <NumberInput
-              label="Amount"
-              value={baseCurrency.amount}
-              onChange={(value) => handleAmountChange(value, 0)}
-              decimalScale={CRYPTO_CURRENCIES.includes(baseCurrency.currency) ? 8 : 2}
-              min={0}
-              hideControls
-              styles={baseInputStyles}
-            />
+            <Box>
+              <Text size="sm" c="gray.4" mb={8} style={{ fontSize: '0.85rem', fontWeight: 500 }}>
+                Amount
+              </Text>
+              <input
+                type="text"
+                value={formatDisplay(baseCurrency.amount)}
+                onChange={(e) => {
+                  const cleanValue = e.target.value.replace(/,/g, '');
+                  const numValue = parseFloat(cleanValue);
+                  if (!isNaN(numValue)) {
+                    handleAmountChange(numValue, 0);
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  background: 'rgba(0, 0, 0, 0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  height: '48px',
+                  fontSize: '1.1rem',
+                  color: '#ffffff',
+                  fontFamily: 'monospace',
+                  textAlign: 'right',
+                  outline: 'none',
+                  transition: 'all 0.2s ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                }}
+                placeholder="0"
+              />
+            </Box>
           </Box>
         </Group>
 
@@ -302,14 +344,39 @@ const CurrencyConverter = () => {
                     />
                   </Box>
                   <Box style={{ flex: 1 }}>
-                    <NumberInput
-                      placeholder="Amount"
-                      value={row.amount}
-                      onChange={(value) => handleAmountChange(value, index + 1)}
-                      decimalScale={CRYPTO_CURRENCIES.includes(row.currency) ? 8 : 2}
-                      min={0}
-                      hideControls
-                      styles={inputStyles}
+                    <input
+                      type="text"
+                      value={formatDisplay(row.amount)}
+                      onChange={(e) => {
+                        const cleanValue = e.target.value.replace(/,/g, '');
+                        const numValue = parseFloat(cleanValue);
+                        if (!isNaN(numValue)) {
+                          handleAmountChange(numValue, index + 1);
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        background: 'rgba(0, 0, 0, 0.2)',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        height: '42px',
+                        fontSize: '1rem',
+                        color: '#ffffff',
+                        fontFamily: 'monospace',
+                        textAlign: 'right',
+                        outline: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                      }}
+                      placeholder="0"
                     />
                   </Box>
                   <ActionIcon

@@ -12,6 +12,8 @@ interface CalculatorProps {
 }
 
 const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
+
+
   const [display, setDisplay] = useState('0');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [lastOperation, setLastOperation] = useState<string | null>(null);
@@ -92,10 +94,10 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
         onHistoryUpdate(newHistory);
       }
       
-      // Store last operation
-      setLastOperation(expressionToEvaluate + ' = ' + result);
+      // Store last operation with formatted result
+      setLastOperation(expressionToEvaluate + ' = ' + Number(result).toLocaleString());
       
-      // Set result as new display
+      // Set result as new display (without formatting for internal storage)
       setDisplay(result);
     } catch (error) {
       console.error('Calculation error:', error);
@@ -192,7 +194,9 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
             {lastOperation}
           </Text>
         )}
-        <Text size="xl" c="gray.0" style={{ wordBreak: 'break-all', fontSize: '24px' }}>{display}</Text>
+        <Text size="xl" c="gray.0" style={{ wordBreak: 'break-all', fontSize: '24px' }}>
+          {display.includes(' ') ? display : Number(display).toLocaleString()}
+        </Text>
       </Box>
 
       {/* Calculator Buttons */}
