@@ -1,4 +1,5 @@
-import { MantineProvider, Box, createTheme, Group } from '@mantine/core'
+import { MantineProvider, Box, createTheme, Group, Tabs } from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
 import CurrencyConverter from './components/CurrencyConverter'
 import Calculator from './components/Calculator'
 import AnimatedBackground from './components/AnimatedBackground'
@@ -6,6 +7,12 @@ import GlitchTitle from './components/GlitchTitle'
 import HistoryPanel from './components/HistoryPanel'
 import { useState } from 'react'
 import '@mantine/core/styles.css'
+
+interface HistoryItem {
+  expression: string;
+  result: string;
+  timestamp: Date;
+}
 
 const theme = createTheme({
   primaryColor: 'cyan',
@@ -59,7 +66,8 @@ const theme = createTheme({
 })
 
 const App = () => {
-  const [calculatorHistory, setCalculatorHistory] = useState([]);
+  const [calculatorHistory, setCalculatorHistory] = useState<HistoryItem[]>([]);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   return (
     <MantineProvider theme={theme}>
@@ -69,7 +77,7 @@ const App = () => {
           minHeight: '100vh',
           minWidth: '100vw',
           margin: 0,
-          padding: '2rem',
+          padding: isMobile ? '1rem' : '2rem',
           position: 'fixed',
           top: 0,
           left: 0,
@@ -82,17 +90,84 @@ const App = () => {
         <AnimatedBackground />
         <Box style={{ position: 'relative', zIndex: 1 }}>
           <GlitchTitle text="Konvert" />
-          <Group align="flex-start" justify="center" gap="xl">
-            <Box style={{ width: '400px', height: '600px' }}>
-              <CurrencyConverter />
-            </Box>
-            <Box style={{ width: '400px', height: '600px' }}>
-              <Calculator onHistoryUpdate={setCalculatorHistory} />
-            </Box>
-            <Box style={{ width: '400px', height: '600px' }}>
-              <HistoryPanel history={calculatorHistory} />
-            </Box>
-          </Group>
+          
+          {isMobile ? (
+            // Mobile layout with tabs
+            <Tabs defaultValue="converter" style={{ marginTop: '2rem' }}>
+              <Tabs.List 
+                style={{ 
+                  justifyContent: 'center',
+                  marginBottom: '2rem',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '12px',
+                  padding: '4px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                }}
+              >
+                <Tabs.Tab 
+                  value="converter"
+                  style={{
+                    color: '#00ffff',
+                    fontFamily: '"Orbitron", sans-serif',
+                    fontWeight: 500,
+                  }}
+                >
+                  Converter
+                </Tabs.Tab>
+                <Tabs.Tab 
+                  value="calculator"
+                  style={{
+                    color: '#00ffff',
+                    fontFamily: '"Orbitron", sans-serif',
+                    fontWeight: 500,
+                  }}
+                >
+                  Calculator
+                </Tabs.Tab>
+                <Tabs.Tab 
+                  value="history"
+                  style={{
+                    color: '#00ffff',
+                    fontFamily: '"Orbitron", sans-serif',
+                    fontWeight: 500,
+                  }}
+                >
+                  History
+                </Tabs.Tab>
+              </Tabs.List>
+
+              <Tabs.Panel value="converter">
+                <Box style={{ width: '100%', height: '500px' }}>
+                  <CurrencyConverter />
+                </Box>
+              </Tabs.Panel>
+
+              <Tabs.Panel value="calculator">
+                <Box style={{ width: '100%', height: '500px' }}>
+                  <Calculator onHistoryUpdate={setCalculatorHistory} />
+                </Box>
+              </Tabs.Panel>
+
+              <Tabs.Panel value="history">
+                <Box style={{ width: '100%', height: '500px' }}>
+                  <HistoryPanel history={calculatorHistory} />
+                </Box>
+              </Tabs.Panel>
+            </Tabs>
+          ) : (
+            // Desktop layout with horizontal panels
+            <Group align="flex-start" justify="center" gap="xl">
+              <Box style={{ width: '400px', height: '600px' }}>
+                <CurrencyConverter />
+              </Box>
+              <Box style={{ width: '400px', height: '600px' }}>
+                <Calculator onHistoryUpdate={setCalculatorHistory} />
+              </Box>
+              <Box style={{ width: '400px', height: '600px' }}>
+                <HistoryPanel history={calculatorHistory} />
+              </Box>
+            </Group>
+          )}
         </Box>
       </Box>
     </MantineProvider>
