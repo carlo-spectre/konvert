@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, Button, Group, Stack, Text, ScrollArea } from '@mantine/core';
+import { Box, Button, Group, Stack, Text, ScrollArea, Tooltip } from '@mantine/core';
 
 interface HistoryItem {
   expression: string;
@@ -7,7 +7,11 @@ interface HistoryItem {
   timestamp: Date;
 }
 
-const Calculator = () => {
+interface CalculatorProps {
+  onHistoryUpdate?: (history: HistoryItem[]) => void;
+}
+
+const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
   const [display, setDisplay] = useState('0');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [lastOperation, setLastOperation] = useState<string | null>(null);
@@ -75,11 +79,18 @@ const Calculator = () => {
       }
 
       // Add to history
-      setHistory(prev => [{
+      const newHistory = [{
         expression: expressionToEvaluate,
         result,
         timestamp: new Date()
-      }, ...prev].slice(0, 10));
+      }, ...history].slice(0, 10);
+      
+      setHistory(newHistory);
+      
+      // Notify parent component of history update
+      if (onHistoryUpdate) {
+        onHistoryUpdate(newHistory);
+      }
       
       // Store last operation
       setLastOperation(expressionToEvaluate + ' = ' + result);
@@ -143,197 +154,162 @@ const Calculator = () => {
   }, [display, isFocused]); // Add isFocused to dependencies
 
   return (
-    <Group align="flex-start" gap="xl" wrap="nowrap">
+    <Box
+      ref={calculatorRef}
+      tabIndex={0}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+      style={{
+        background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '16px',
+        padding: '24px',
+        border: '1px solid rgba(255,255,255,0.1)',
+        width: '100%',
+        height: '100%',
+        outline: 'none',
+        transition: 'all 0.3s ease',
+        '&:focus': {
+          boxShadow: '0 0 0 2px rgba(0, 255, 255, 0.5)',
+        },
+      }}
+    >
+      {/* Display */}
       <Box
-        ref={calculatorRef}
-        tabIndex={0}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
         style={{
-          background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid rgba(255,255,255,0.1)',
-          width: '320px',
-          outline: 'none',
-          transition: 'all 0.3s ease',
-          '&:focus': {
-            boxShadow: '0 0 0 2px rgba(0, 255, 255, 0.5)',
-          },
+          background: 'rgba(0,0,0,0.4)',
+          padding: '16px',
+          borderRadius: '8px',
+          marginBottom: '24px',
+          minHeight: '80px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
         }}
       >
-        {/* Display */}
-        <Box
-          style={{
-            background: 'rgba(0,0,0,0.4)',
-            padding: '16px',
-            borderRadius: '8px',
-            marginBottom: '24px',
-            minHeight: '80px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
+        {lastOperation && (
+          <Text size="xs" c="gray.4" style={{ marginBottom: '8px' }}>
+            {lastOperation}
+          </Text>
+        )}
+        <Text size="xl" c="gray.0" style={{ wordBreak: 'break-all', fontSize: '24px' }}>{display}</Text>
+      </Box>
+
+      {/* Calculator Buttons */}
+      <Group mb="lg" grow>
+        <Button 
+          variant="subtle" 
+          color="red" 
+          onClick={handleClear}
+          style={{ background: 'rgba(255,82,82,0.15)', height: '45px', fontSize: '16px' }}
+        >
+          C
+        </Button>
+        <Button 
+          variant="subtle" 
+          onClick={handleDelete}
+          style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+        >
+          ←
+        </Button>
+        <Button 
+          variant="subtle"
+          onClick={() => handleOperator('÷')}
+          style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+        >
+          ÷
+        </Button>
+      </Group>
+
+      <Group mb="lg" grow>
+        {['7', '8', '9'].map(num => (
+          <Button
+            key={num}
+            variant="subtle"
+            onClick={() => handleNumber(num)}
+            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+          >
+            {num}
+          </Button>
+        ))}
+        <Button
+          variant="subtle"
+          onClick={() => handleOperator('×')}
+          style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+        >
+          ×
+        </Button>
+      </Group>
+
+      <Group mb="lg" grow>
+        {['4', '5', '6'].map(num => (
+          <Button
+            key={num}
+            variant="subtle"
+            onClick={() => handleNumber(num)}
+            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+          >
+          {num}
+          </Button>
+        ))}
+        <Button
+          variant="subtle"
+          onClick={() => handleOperator('-')}
+          style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+        >
+          -
+        </Button>
+      </Group>
+
+      <Group mb="lg" grow>
+        {['1', '2', '3'].map(num => (
+          <Button
+            key={num}
+            variant="subtle"
+            onClick={() => handleNumber(num)}
+            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+          >
+            {num}
+          </Button>
+        ))}
+        <Button
+          variant="subtle"
+          onClick={() => handleOperator('+')}
+          style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+        >
+          +
+        </Button>
+      </Group>
+
+      <Group grow>
+        <Button
+          variant="subtle"
+          onClick={() => handleNumber('0')}
+          style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+        >
+          0
+        </Button>
+        <Button
+          variant="subtle"
+          onClick={() => handleNumber('.')}
+          style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
+        >
+          .
+        </Button>
+        <Button
+          variant="subtle"
+          color="blue"
+          onClick={handleEquals}
+          style={{ 
+            background: 'rgba(51,154,240,0.2)',
+            height: '45px',
+            fontSize: '16px'
           }}
         >
-          {lastOperation && (
-            <Text size="xs" c="gray.4" style={{ marginBottom: '8px' }}>
-              {lastOperation}
-            </Text>
-          )}
-          <Text size="xl" c="gray.0" style={{ wordBreak: 'break-all', fontSize: '24px' }}>{display}</Text>
-        </Box>
-
-        {/* Calculator Buttons */}
-        <Group mb="lg" grow>
-          <Button 
-            variant="subtle" 
-            color="red" 
-            onClick={handleClear}
-            style={{ background: 'rgba(255,82,82,0.15)', height: '45px', fontSize: '16px' }}
-          >
-            C
-          </Button>
-          <Button 
-            variant="subtle" 
-            onClick={handleDelete}
-            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-          >
-            ←
-          </Button>
-          <Button 
-            variant="subtle"
-            onClick={() => handleOperator('÷')}
-            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-          >
-            ÷
-          </Button>
-        </Group>
-
-        <Group mb="lg" grow>
-          {['7', '8', '9'].map(num => (
-            <Button
-              key={num}
-              variant="subtle"
-              onClick={() => handleNumber(num)}
-              style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-            >
-              {num}
-            </Button>
-          ))}
-          <Button
-            variant="subtle"
-            onClick={() => handleOperator('×')}
-            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-          >
-            ×
-          </Button>
-        </Group>
-
-        <Group mb="lg" grow>
-          {['4', '5', '6'].map(num => (
-            <Button
-              key={num}
-              variant="subtle"
-              onClick={() => handleNumber(num)}
-              style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-            >
-              {num}
-            </Button>
-          ))}
-          <Button
-            variant="subtle"
-            onClick={() => handleOperator('-')}
-            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-          >
-            -
-          </Button>
-        </Group>
-
-        <Group mb="lg" grow>
-          {['1', '2', '3'].map(num => (
-            <Button
-              key={num}
-              variant="subtle"
-              onClick={() => handleNumber(num)}
-              style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-            >
-              {num}
-            </Button>
-          ))}
-          <Button
-            variant="subtle"
-            onClick={() => handleOperator('+')}
-            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-          >
-            +
-          </Button>
-        </Group>
-
-        <Group grow>
-          <Button
-            variant="subtle"
-            onClick={() => handleNumber('0')}
-            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-          >
-            0
-          </Button>
-          <Button
-            variant="subtle"
-            onClick={() => handleNumber('.')}
-            style={{ background: 'rgba(255,255,255,0.1)', height: '45px', fontSize: '16px' }}
-          >
-            .
-          </Button>
-          <Button
-            variant="subtle"
-            color="blue"
-            onClick={handleEquals}
-            style={{ 
-              background: 'rgba(51,154,240,0.2)',
-              height: '45px',
-              fontSize: '16px'
-            }}
-          >
-            =
-          </Button>
-        </Group>
-      </Box>
-
-      {/* History */}
-      <Box
-        style={{
-          background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid rgba(255,255,255,0.1)',
-          flex: 1
-        }}
-      >
-        <Text size="lg" c="gray.3" mb="md" style={{ fontSize: '18px', fontWeight: 500 }}>Calculation History</Text>
-        <ScrollArea h={400} type="scroll">
-          <Stack gap="md">
-            {history.map((item, index) => (
-              <Box
-                key={index}
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  padding: '16px 20px',
-                  borderRadius: '8px',
-                }}
-              >
-                <Text size="md" c="gray.4" style={{ fontSize: '16px' }}>{item.expression} =</Text>
-                <Text c="gray.0" style={{ fontSize: '24px', marginTop: '8px', fontWeight: 500 }}>{item.result}</Text>
-                <Text size="xs" c="gray.5" style={{ marginTop: '8px' }}>
-                  {item.timestamp.toLocaleTimeString()}
-                </Text>
-              </Box>
-            ))}
-          </Stack>
-        </ScrollArea>
-      </Box>
-    </Group>
+          =
+        </Button>
+      </Group>
+    </Box>
   );
 };
 

@@ -6,16 +6,24 @@ const AnimatedBackground = () => {
     <Box
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
+        inset: 0,
         zIndex: 0,
-        overflow: 'hidden',
-        background: '#000',
+        pointerEvents: 'none',
+        background: '#0a0a0a',
       }}
     >
+      {/* Digital scanline effect */}
+      <Box
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: 'none',
+          background:
+            'repeating-linear-gradient(to bottom, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 4px)',
+          animation: 'scanline-move 1s linear infinite',
+        }}
+      />
       <Box
         style={{
           position: 'absolute',
@@ -128,6 +136,11 @@ const AnimatedBackground = () => {
             to {
               transform: translateY(50px);
             }
+          }
+
+          @keyframes scanline-move {
+            0% { background-position-y: 0; }
+            100% { background-position-y: 4px; }
           }
         `}
       </style>

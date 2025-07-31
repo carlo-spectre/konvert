@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Select, NumberInput, Button, Group, Stack, ActionIcon, Divider, Text } from '@mantine/core';
+import { Box, Select, NumberInput, Button, Group, Stack, ActionIcon, Divider, Text, ScrollArea } from '@mantine/core';
 import { IconTrash, IconPlus } from '@tabler/icons-react';
 
 const CURRENCIES = [
@@ -97,8 +97,10 @@ interface CurrencyRow {
 
 const CurrencyConverter = () => {
   const [rows, setRows] = useState<CurrencyRow[]>([
-    { id: '1', currency: 'USD', amount: 1 },
-    { id: '2', currency: 'EUR', amount: 0 },
+    { id: '1', currency: 'HKD', amount: 1 },
+    { id: '2', currency: 'USD', amount: 0 },
+    { id: '3', currency: 'PHP', amount: 0 },
+    { id: '4', currency: 'JPY', amount: 0 },
   ]);
   const [rates, setRates] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -233,74 +235,120 @@ const CurrencyConverter = () => {
           borderRadius: '16px',
           padding: '24px',
           border: '1px solid rgba(255,255,255,0.1)',
-          overflow: 'hidden',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}
       >
-        <Text c="dimmed" ta="center">Loading exchange rates...</Text>
+        <Text c="gray.4">Loading rates...</Text>
       </Box>
     );
   }
 
-  return (
-    <Box style={containerStyles}>
-      <Stack gap="md">
-        {rows.map((row, index) => (
-          <Group key={row.id} style={rowStyles} align="center">
-            <Box style={{ flex: 1 }}>
-              <Select
-                label={index === 0 ? "Base Currency" : undefined}
-                placeholder={index === 0 ? undefined : "Select currency"}
-                value={row.currency}
-                onChange={(value) => handleCurrencyChange(value, index)}
-                data={CURRENCIES.filter(c => 
-                  c.value === row.currency || 
-                  !rows.some(r => r.currency === c.value)
-                )}
-                styles={index === 0 ? baseInputStyles : inputStyles}
-              />
-            </Box>
-            <Box style={{ flex: 1 }}>
-              <NumberInput
-                label={index === 0 ? "Amount" : undefined}
-                placeholder={index === 0 ? undefined : "Amount"}
-                value={row.amount}
-                onChange={(value) => handleAmountChange(value, index)}
-                decimalScale={CRYPTO_CURRENCIES.includes(row.currency) ? 8 : 2}
-                min={0}
-                hideControls
-                styles={index === 0 ? baseInputStyles : inputStyles}
-              />
-            </Box>
-            {index > 0 && ( // Show delete button for all rows except base currency
-              <ActionIcon
-                color="red"
-                variant="subtle"
-                onClick={() => removeCurrency(index)}
-                style={{ marginTop: index === 0 ? '32px' : 0 }}
-              >
-                <IconTrash size={20} />
-              </ActionIcon>
-            )}
-          </Group>
-        ))}
+  // Separate base currency and additional currencies
+  const baseCurrency = rows[0];
+  const additionalCurrencies = rows.slice(1);
+  const visibleCurrencies = additionalCurrencies.slice(0, 4);
+  const scrollableCurrencies = additionalCurrencies.slice(4);
+
+    return (
+    <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box style={{ ...containerStyles, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {/* Base Currency - Always fixed at top */}
+        <Group key={baseCurrency.id} style={rowStyles} align="flex-end">
+          <Box style={{ flex: 1 }}>
+            <Select
+              label="Base Currency"
+              value={baseCurrency.currency}
+              onChange={(value) => handleCurrencyChange(value, 0)}
+              data={CURRENCIES.filter(c => 
+                c.value === baseCurrency.currency || 
+                !rows.some(r => r.currency === c.value)
+              )}
+              styles={baseInputStyles}
+            />
+          </Box>
+          <Box style={{ flex: 1 }}>
+            <NumberInput
+              label="Amount"
+              value={baseCurrency.amount}
+              onChange={(value) => handleAmountChange(value, 0)}
+              decimalScale={CRYPTO_CURRENCIES.includes(baseCurrency.currency) ? 8 : 2}
+              min={0}
+              hideControls
+              styles={baseInputStyles}
+            />
+          </Box>
+        </Group>
+
+        {/* Scrollable area for additional currencies - fills remaining space */}
+        <Box style={{ flex: 1, overflow: 'hidden' }}>
+          <ScrollArea h="100%" type="scroll">
+            <Stack gap="md">
+              {/* All Additional Currencies */}
+              {additionalCurrencies.map((row, index) => (
+                <Group key={row.id} style={rowStyles} align="flex-end">
+                  <Box style={{ flex: 1 }}>
+                    <Select
+                      placeholder="Select currency"
+                      value={row.currency}
+                      onChange={(value) => handleCurrencyChange(value, index + 1)}
+                      data={CURRENCIES.filter(c => 
+                        c.value === row.currency || 
+                        !rows.some(r => r.currency === c.value)
+                      )}
+                      styles={inputStyles}
+                    />
+                  </Box>
+                  <Box style={{ flex: 1 }}>
+                    <NumberInput
+                      placeholder="Amount"
+                      value={row.amount}
+                      onChange={(value) => handleAmountChange(value, index + 1)}
+                      decimalScale={CRYPTO_CURRENCIES.includes(row.currency) ? 8 : 2}
+                      min={0}
+                      hideControls
+                      styles={inputStyles}
+                    />
+                  </Box>
+                  <ActionIcon
+                    color="red"
+                    variant="subtle"
+                    onClick={() => removeCurrency(index + 1)}
+                    style={{ marginTop: 0 }}
+                  >
+                    <IconTrash size={20} />
+                  </ActionIcon>
+                </Group>
+              ))}
+            </Stack>
+          </ScrollArea>
+        </Box>
         
+        {/* Add Currency Button - INSIDE the container */}
         {rows.length < CURRENCIES.length && (
           <Button
             leftSection={<IconPlus size={20} />}
             variant="subtle"
             onClick={addCurrency}
+            fullWidth
             style={{
               backgroundColor: 'rgba(0, 255, 255, 0.1)',
               color: '#00ffff',
+              marginTop: '16px',
+              borderRadius: '8px',
+              border: '1px solid rgba(0, 255, 255, 0.2)',
               '&:hover': {
                 backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                borderColor: 'rgba(0, 255, 255, 0.4)',
               }
             }}
           >
             Add Currency
           </Button>
         )}
-      </Stack>
+      </Box>
     </Box>
   );
 };
