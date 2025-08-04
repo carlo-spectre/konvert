@@ -21,7 +21,21 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
   const calculatorRef = useRef<HTMLDivElement>(null);
 
   const handleNumber = (num: string) => {
-    setDisplay(prev => prev === '0' ? num : prev + num);
+    setDisplay(prev => {
+      if (prev === '0') {
+        return num;
+      }
+      
+      // If we're in the middle of an expression, just add the number
+      if (prev.includes(' ')) {
+        return prev + num;
+      }
+      
+      // If it's just a single number, add to it and format
+      const cleanPrev = prev.replace(/,/g, '');
+      const newNumber = cleanPrev + num;
+      return Number(newNumber).toLocaleString();
+    });
   };
 
   const handleOperator = (op: string) => {
@@ -62,10 +76,11 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
         expressionToEvaluate = expressionToEvaluate.slice(0, -3);
       }
 
-      // Replace × with * and ÷ with / for evaluation
+      // Replace × with * and ÷ with / for evaluation, and remove commas
       const sanitizedExpression = expressionToEvaluate
         .replace(/×/g, '*')
         .replace(/÷/g, '/')
+        .replace(/,/g, '') // Remove commas
         .replace(/\s/g, ''); // Remove all spaces
       
       console.log('Expression to evaluate:', sanitizedExpression);
@@ -97,8 +112,8 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
       // Store last operation with formatted result
       setLastOperation(expressionToEvaluate + ' = ' + Number(result).toLocaleString());
       
-      // Set result as new display (without formatting for internal storage)
-      setDisplay(result);
+      // Set result as new display with formatting
+      setDisplay(Number(result).toLocaleString());
     } catch (error) {
       console.error('Calculation error:', error);
       setDisplay('Error');
@@ -195,7 +210,7 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
           </Text>
         )}
         <Text size="xl" c="gray.0" style={{ wordBreak: 'break-all', fontSize: '24px' }}>
-          {display.includes(' ') ? display : Number(display).toLocaleString()}
+          {display}
         </Text>
       </Box>
 

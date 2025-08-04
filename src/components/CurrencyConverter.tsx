@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Select, NumberInput, Button, Group, Stack, ActionIcon, Divider, Text, ScrollArea } from '@mantine/core';
-import { IconTrash, IconPlus } from '@tabler/icons-react';
+import { Box, Select, NumberInput, Button, Group, Stack, ActionIcon, Divider, Text, ScrollArea, Tabs } from '@mantine/core';
+import { IconTrash, IconPlus, IconChevronDown, IconCurrencyDollar, IconCurrencyEuro, IconCurrencyPound, IconCurrencyYen, IconCurrencyDollarOff, IconCurrencyBitcoin, IconCurrencyEthereum, IconFlag, IconSearch } from '@tabler/icons-react';
 
-const CURRENCIES = [
-  { label: 'US Dollar (USD)', value: 'USD' },
-  { label: 'Euro (EUR)', value: 'EUR' },
-  { label: 'British Pound (GBP)', value: 'GBP' },
-  { label: 'Japanese Yen (JPY)', value: 'JPY' },
-  { label: 'Hong Kong Dollar (HKD)', value: 'HKD' },
-  { label: 'Philippine Peso (PHP)', value: 'PHP' },
-  { label: 'Malaysian Ringgit (MYR)', value: 'MYR' },
-  { label: 'Singapore Dollar (SGD)', value: 'SGD' },
-  { label: 'Bitcoin (BTC)', value: 'BTC' },
-  { label: 'Ethereum (ETH)', value: 'ETH' },
-  { label: 'Solana (SOL)', value: 'SOL' },
-  { label: 'Australian Dollar (AUD)', value: 'AUD' },
-  { label: 'New Zealand Dollar (NZD)', value: 'NZD' },
-  { label: 'Canadian Dollar (CAD)', value: 'CAD' },
-  { label: 'Swiss Franc (CHF)', value: 'CHF' },
+const FIAT_CURRENCIES = [
+  { label: 'AUD', value: 'AUD', flag: '🇦🇺' },
+  { label: 'CAD', value: 'CAD', flag: '🇨🇦' },
+  { label: 'CHF', value: 'CHF', flag: '🇨🇭' },
+  { label: 'EUR', value: 'EUR', flag: '🇪🇺' },
+  { label: 'GBP', value: 'GBP', flag: '🇬🇧' },
+  { label: 'HKD', value: 'HKD', flag: '🇭🇰' },
+  { label: 'JPY', value: 'JPY', flag: '🇯🇵' },
+  { label: 'MYR', value: 'MYR', flag: '🇲🇾' },
+  { label: 'NZD', value: 'NZD', flag: '🇳🇿' },
+  { label: 'PHP', value: 'PHP', flag: '🇵🇭' },
+  { label: 'SGD', value: 'SGD', flag: '🇸🇬' },
+  { label: 'USD', value: 'USD', flag: '🇺🇸' },
 ];
 
-const CRYPTO_CURRENCIES = ['BTC', 'ETH', 'SOL'];
+const CRYPTO_CURRENCIES = [
+  { label: 'BTC', value: 'BTC', icon: IconCurrencyBitcoin },
+  { label: 'ETH', value: 'ETH', icon: IconCurrencyEthereum },
+  { label: 'SOL', value: 'SOL', icon: IconCurrencyDollarOff },
+];
+
+const CURRENCIES = [...FIAT_CURRENCIES, ...CRYPTO_CURRENCIES];
 
 const containerStyles = {
   background: 'linear-gradient(145deg, #1a1a1a, #0a0a0a)',
@@ -115,6 +118,269 @@ const CurrencyConverter = () => {
   const [rates, setRates] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
+  // Custom Currency Selector Component with Tabs
+  const CurrencySelector = ({ value, onChange, label, placeholder, styles }: {
+    value: string;
+    onChange: (value: string | null) => void;
+    label?: string;
+    placeholder?: string;
+    styles?: any;
+  }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<'fiat' | 'crypto'>('fiat');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const availableFiat = FIAT_CURRENCIES.filter(c => 
+      c.value === value || !rows.some(r => r.currency === c.value)
+    ).filter(c => 
+      c.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const availableCrypto = CRYPTO_CURRENCIES.filter(c => 
+      c.value === value || !rows.some(r => r.currency === c.value)
+    ).filter(c => 
+      c.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+      <Box style={{ position: 'relative' }}>
+        {label && (
+          <Text size="sm" c="gray.4" mb={8} style={{ fontSize: '0.85rem', fontWeight: 500 }}>
+            {label}
+          </Text>
+        )}
+        
+        {/* Trigger Button */}
+        <Box
+          onClick={() => setIsOpen(!isOpen)}
+          style={{
+            ...styles?.input,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 16px',
+          }}
+        >
+          <Box style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {value && (
+              <Text style={{ fontSize: '1rem' }}>
+                {FIAT_CURRENCIES.find(c => c.value === value)?.flag || ''}
+              </Text>
+            )}
+            <Text style={{ color: '#ffffff' }}>
+              {value || placeholder || 'Select currency'}
+            </Text>
+          </Box>
+          <IconChevronDown 
+            size={16} 
+            style={{ color: '#00ffff', marginLeft: '8px' }} 
+          />
+        </Box>
+
+        {/* Dropdown with Tabs */}
+        {isOpen && (
+          <Box
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              zIndex: 1000,
+              background: 'rgba(0, 0, 0, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
+              marginTop: '4px',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <Tabs value={activeTab} onChange={(val) => setActiveTab(val as 'fiat' | 'crypto')}>
+              <Tabs.List style={{ 
+                background: 'rgba(255, 255, 255, 0.05)', 
+                border: 'none',
+                justifyContent: 'center',
+                display: 'flex'
+              }}>
+                <Tabs.Tab 
+                  value="fiat" 
+                  style={{ 
+                    color: '#00ffff', 
+                    fontSize: '0.8rem',
+                    padding: '8px 12px'
+                  }}
+                >
+                  Fiat
+                </Tabs.Tab>
+                <Tabs.Tab 
+                  value="crypto" 
+                  style={{ 
+                    color: '#ff00ff', 
+                    fontSize: '0.8rem',
+                    padding: '8px 12px'
+                  }}
+                >
+                  Crypto
+                </Tabs.Tab>
+              </Tabs.List>
+
+                                        <Tabs.Panel value="fiat" style={{ padding: '12px' }}>
+                <Stack gap={6}>
+                  {/* Search Input */}
+                  <Box
+                    style={{
+                      position: 'relative',
+                      marginBottom: '8px'
+                    }}
+                  >
+                    <IconSearch 
+                      size={16} 
+                      style={{ 
+                        position: 'absolute', 
+                        left: '12px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        zIndex: 1
+                      }} 
+                    />
+                    <input
+                      type="text"
+                      placeholder="Search"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      style={{
+                        width: '100%',
+                        background: 'rgba(0, 0, 0, 0.3)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '6px',
+                        padding: '8px 12px 8px 36px',
+                        fontSize: '0.9rem',
+                        color: '#ffffff',
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                      }}
+                    />
+                  </Box>
+                  {availableFiat.map((currency) => (
+                    <Box
+                      key={currency.value}
+                      onClick={() => {
+                        onChange(currency.value);
+                        setIsOpen(false);
+                      }}
+                      style={{
+                        padding: '12px 16px',
+                        cursor: 'pointer',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '0.9rem',
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <Text style={{ fontSize: '1.2rem' }}>{currency.flag}</Text>
+                      {currency.label}
+                    </Box>
+                  ))}
+                </Stack>
+              </Tabs.Panel>
+
+              <Tabs.Panel value="crypto" style={{ padding: '12px' }}>
+                <Stack gap={6}>
+                  {/* Search Input */}
+                  <Box
+                    style={{
+                      position: 'relative',
+                      marginBottom: '8px'
+                    }}
+                  >
+                    <IconSearch 
+                      size={16} 
+                      style={{ 
+                        position: 'absolute', 
+                        left: '12px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        zIndex: 1
+                      }} 
+                    />
+                    <input
+                      type="text"
+                      placeholder="Search"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      style={{
+                        width: '100%',
+                        background: 'rgba(0, 0, 0, 0.3)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '6px',
+                        padding: '8px 12px 8px 36px',
+                        fontSize: '0.9rem',
+                        color: '#ffffff',
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = 'rgba(255, 0, 255, 0.3)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                      }}
+                    />
+                  </Box>
+                  {availableCrypto.map((currency) => {
+                    const IconComponent = currency.icon;
+                    return (
+                      <Box
+                        key={currency.value}
+                        onClick={() => {
+                          onChange(currency.value);
+                          setIsOpen(false);
+                        }}
+                        style={{
+                          padding: '12px 16px',
+                          cursor: 'pointer',
+                          borderRadius: '6px',
+                          color: '#ffffff',
+                          fontSize: '0.9rem',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 0, 255, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        <IconComponent size={18} style={{ color: '#ff00ff' }} />
+                        {currency.label}
+                      </Box>
+                    );
+                  })}
+                </Stack>
+              </Tabs.Panel>
+            </Tabs>
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
   const fetchRates = async () => {
     try {
       // Fetch crypto rates
@@ -176,7 +442,8 @@ const CurrencyConverter = () => {
 
   const calculateAmount = (baseAmount: number, fromCurrency: string, toCurrency: string, currentRates: Record<string, number>) => {
     const usdAmount = baseAmount / currentRates[fromCurrency];
-    return Number((usdAmount * currentRates[toCurrency]).toFixed(CRYPTO_CURRENCIES.includes(toCurrency) ? 8 : 2));
+    const isCrypto = CRYPTO_CURRENCIES.some(c => c.value === toCurrency);
+    return Number((usdAmount * currentRates[toCurrency]).toFixed(isCrypto ? 8 : 2));
   };
 
   const updateConversions = (newRows: CurrencyRow[], currentRates: Record<string, number> = rates) => {
@@ -270,14 +537,10 @@ const CurrencyConverter = () => {
         {/* Base Currency - Always fixed at top */}
         <Group key={baseCurrency.id} style={rowStyles} align="flex-end">
           <Box style={{ flex: 1 }}>
-            <Select
+            <CurrencySelector
               label="Base Currency"
               value={baseCurrency.currency}
               onChange={(value) => handleCurrencyChange(value, 0)}
-              data={CURRENCIES.filter(c => 
-                c.value === baseCurrency.currency || 
-                !rows.some(r => r.currency === c.value)
-              )}
               styles={baseInputStyles}
             />
           </Box>
@@ -332,14 +595,10 @@ const CurrencyConverter = () => {
               {additionalCurrencies.map((row, index) => (
                 <Group key={row.id} style={rowStyles} align="flex-end">
                   <Box style={{ flex: 1 }}>
-                    <Select
+                    <CurrencySelector
                       placeholder="Select currency"
                       value={row.currency}
                       onChange={(value) => handleCurrencyChange(value, index + 1)}
-                      data={CURRENCIES.filter(c => 
-                        c.value === row.currency || 
-                        !rows.some(r => r.currency === c.value)
-                      )}
                       styles={inputStyles}
                     />
                   </Box>

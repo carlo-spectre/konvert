@@ -4,6 +4,8 @@ import CurrencyConverter from './components/CurrencyConverter'
 import Calculator from './components/Calculator'
 import AnimatedBackground from './components/AnimatedBackground'
 import GlitchTitle from './components/GlitchTitle'
+import StockTicker from './components/StockTicker'
+import CryptoTicker from './components/CryptoTicker'
 import HistoryPanel from './components/HistoryPanel'
 import { useState } from 'react'
 import '@mantine/core/styles.css'
@@ -122,6 +124,8 @@ const App = () => {
         <AnimatedBackground />
         <Box style={{ position: 'relative', zIndex: 1 }}>
           <GlitchTitle text="Konvert" />
+          <StockTicker />
+          <CryptoTicker />
           
           {isMobile ? (
             // Mobile layout with tabs
@@ -183,19 +187,19 @@ const App = () => {
               </Tabs.List>
 
               <Tabs.Panel value="converter">
-                <Box style={{ width: '100%', height: '500px' }}>
+                <Box style={{ width: '100%', height: '400px' }}>
                   <CurrencyConverter />
                 </Box>
               </Tabs.Panel>
 
               <Tabs.Panel value="calculator">
-                <Box style={{ width: '100%', height: '500px' }}>
+                <Box style={{ width: '100%', height: '400px' }}>
                   <Calculator onHistoryUpdate={setCalculatorHistory} />
                 </Box>
               </Tabs.Panel>
 
               <Tabs.Panel value="history">
-                <Box style={{ width: '100%', height: '500px' }}>
+                <Box style={{ width: '100%', height: '400px' }}>
                   <HistoryPanel history={calculatorHistory} />
                 </Box>
               </Tabs.Panel>
@@ -203,13 +207,13 @@ const App = () => {
           ) : (
             // Desktop layout with horizontal panels
             <Group align="flex-start" justify="center" gap="xl">
-              <Box style={{ width: '400px', height: '600px' }}>
+              <Box style={{ width: '400px', height: '500px' }}>
                 <CurrencyConverter />
               </Box>
-              <Box style={{ width: '400px', height: '600px' }}>
+              <Box style={{ width: '400px', height: '500px' }}>
                 <Calculator onHistoryUpdate={setCalculatorHistory} />
               </Box>
-              <Box style={{ width: '400px', height: '600px' }}>
+              <Box style={{ width: '400px', height: '500px' }}>
                 <HistoryPanel history={calculatorHistory} />
               </Box>
             </Group>
