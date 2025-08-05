@@ -110,6 +110,19 @@ const App = () => {
           .mantine-Tabs-tab[data-active] {
             border-bottom: 2px solid #00ffff !important;
           }
+          
+          /* Mobile tab styles */
+          .mantine-Tabs-tab {
+            color: rgba(255, 255, 255, 0.5) !important;
+          }
+          
+          .mantine-Tabs-tab[data-active] {
+            color: #00ffff !important;
+          }
+          
+          .mantine-Tabs-tab:hover {
+            color: rgba(255, 255, 255, 0.7) !important;
+          }
         `}
       </style>
       <Box 
@@ -189,6 +202,7 @@ const App = () => {
                   padding: '4px',
                   border: 'none',
                 },
+
                 root: {
                   border: 'none !important',
                   outline: 'none !important',
@@ -196,34 +210,13 @@ const App = () => {
               }}
             >
               <Tabs.List>
-                <Tabs.Tab 
-                  value="converter"
-                  style={{
-                    color: '#00ffff',
-                    fontFamily: '"Orbitron", sans-serif',
-                    fontWeight: 500,
-                  }}
-                >
+                <Tabs.Tab value="converter">
                   Converter
                 </Tabs.Tab>
-                <Tabs.Tab 
-                  value="calculator"
-                  style={{
-                    color: '#00ffff',
-                    fontFamily: '"Orbitron", sans-serif',
-                    fontWeight: 500,
-                  }}
-                >
+                <Tabs.Tab value="calculator">
                   Calculator
                 </Tabs.Tab>
-                <Tabs.Tab 
-                  value="history"
-                  style={{
-                    color: '#00ffff',
-                    fontFamily: '"Orbitron", sans-serif',
-                    fontWeight: 500,
-                  }}
-                >
+                <Tabs.Tab value="history">
                   History
                 </Tabs.Tab>
               </Tabs.List>
