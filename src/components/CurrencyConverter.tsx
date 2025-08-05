@@ -104,6 +104,7 @@ interface CurrencyRow {
 const CurrencyConverter = () => {
   // Simple formatter for display
   const formatDisplay = (value: number) => {
+    if (value === 0) return '';
     return value.toLocaleString('en-US', { 
       minimumFractionDigits: 0,
       maximumFractionDigits: 8 
@@ -459,8 +460,18 @@ const CurrencyConverter = () => {
   };
 
   const handleAmountChange = (value: string | number, index: number) => {
-    const numValue = typeof value === 'string' ? parseFloat(value) : value;
-    if (isNaN(numValue)) return;
+    let numValue: number;
+    
+    if (typeof value === 'string') {
+      if (value === '' || value === '0') {
+        numValue = 0;
+      } else {
+        numValue = parseFloat(value);
+        if (isNaN(numValue)) return;
+      }
+    } else {
+      numValue = value;
+    }
     
     const newRows = [...rows];
     newRows[index] = { ...newRows[index], amount: numValue };
@@ -556,10 +567,7 @@ const CurrencyConverter = () => {
                 value={formatDisplay(baseCurrency.amount)}
                 onChange={(e) => {
                   const cleanValue = e.target.value.replace(/,/g, '');
-                  const numValue = parseFloat(cleanValue);
-                  if (!isNaN(numValue)) {
-                    handleAmountChange(numValue, 0);
-                  }
+                  handleAmountChange(cleanValue, 0);
                 }}
                 onClick={(e) => {
                   // Clear the input when clicked/tapped
@@ -596,7 +604,7 @@ const CurrencyConverter = () => {
         </Group>
 
         {/* Scrollable area for additional currencies - fills remaining space */}
-        <Box style={{ flex: 1, overflow: 'hidden' }}>
+        <Box style={{ flex: 1, overflow: 'hidden', marginBottom: '16px' }}>
           <ScrollArea 
             h="100%" 
             type="scroll"
@@ -637,10 +645,7 @@ const CurrencyConverter = () => {
                       value={formatDisplay(row.amount)}
                       onChange={(e) => {
                         const cleanValue = e.target.value.replace(/,/g, '');
-                        const numValue = parseFloat(cleanValue);
-                        if (!isNaN(numValue)) {
-                          handleAmountChange(numValue, index + 1);
-                        }
+                        handleAmountChange(cleanValue, index + 1);
                       }}
                       onClick={(e) => {
                         // Clear the input when clicked/tapped
@@ -683,32 +688,31 @@ const CurrencyConverter = () => {
                   </ActionIcon>
                 </Group>
               ))}
-              
-              {/* Add Currency Button - INSIDE the ScrollArea */}
-              {rows.length < CURRENCIES.length && (
-                <Button
-                  leftSection={<IconPlus size={20} />}
-                  variant="subtle"
-                  onClick={addCurrency}
-                  fullWidth
-                  style={{
-                    backgroundColor: 'rgba(0, 255, 255, 0.1)',
-                    color: '#00ffff',
-                    marginTop: '16px',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(0, 255, 255, 0.2)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 255, 255, 0.2)',
-                      borderColor: 'rgba(0, 255, 255, 0.4)',
-                    }
-                  }}
-                >
-                  Add Currency
-                </Button>
-              )}
             </Stack>
           </ScrollArea>
         </Box>
+
+        {/* Add Currency Button - FIXED at bottom */}
+        {rows.length < CURRENCIES.length && (
+          <Button
+            leftSection={<IconPlus size={20} />}
+            variant="subtle"
+            onClick={addCurrency}
+            fullWidth
+            style={{
+              backgroundColor: 'rgba(0, 255, 255, 0.1)',
+              color: '#00ffff',
+              borderRadius: '8px',
+              border: '1px solid rgba(0, 255, 255, 0.2)',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                borderColor: 'rgba(0, 255, 255, 0.4)',
+              }
+            }}
+          >
+            Add Currency
+          </Button>
+        )}
       </Box>
     </Box>
   );
