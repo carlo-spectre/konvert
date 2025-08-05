@@ -136,7 +136,7 @@ const App = () => {
             // Mobile layout with tabs
             <Tabs 
               defaultValue="converter" 
-              style={{ marginTop: '2rem' }}
+              style={{ marginTop: '2rem', marginBottom: '2rem' }}
               styles={{
                 panel: {
                   border: 'none !important',
@@ -192,13 +192,13 @@ const App = () => {
               </Tabs.List>
 
               <Tabs.Panel value="converter">
-                <Box style={{ width: '100%', height: '400px' }}>
+                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
                   <CurrencyConverter />
                 </Box>
               </Tabs.Panel>
 
               <Tabs.Panel value="calculator">
-                <Box style={{ width: '100%', height: '400px' }}>
+                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
                   <Calculator 
                     onHistoryUpdate={setCalculatorHistory} 
                     selectedExpression={selectedHistoryExpression}
@@ -208,7 +208,7 @@ const App = () => {
               </Tabs.Panel>
 
               <Tabs.Panel value="history">
-                <Box style={{ width: '100%', height: '400px' }}>
+                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
                   <HistoryPanel 
                     history={calculatorHistory} 
                     onHistoryClick={handleHistoryClick}
