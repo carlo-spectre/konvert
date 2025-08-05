@@ -147,7 +147,9 @@ const CurrencyConverter = () => {
     { id: '2', currency: 'USD', amount: 0 },
     { id: '3', currency: 'PHP', amount: 0 },
     { id: '4', currency: 'MYR', amount: 0 },
+    { id: '5', currency: 'JPY', amount: 0 },
   ]);
+  const [deleteMode, setDeleteMode] = useState(false);
   const [rates, setRates] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
@@ -578,7 +580,7 @@ const CurrencyConverter = () => {
     <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box style={{ ...containerStyles, height: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Base Currency - Always fixed at top */}
-        <Group key={baseCurrency.id} style={rowStyles} align="flex-end">
+        <Group key={baseCurrency.id} style={{...rowStyles, marginBottom: '16px'}} align="flex-end">
           <Box style={{ flex: 1 }}>
             <CurrencySelector
               label="Base Currency"
@@ -657,10 +659,14 @@ const CurrencyConverter = () => {
               }
             }}
           >
-            <Stack gap="md">
+            <Stack gap="8px">
               {/* All Additional Currencies */}
               {additionalCurrencies.map((row, index) => (
-                <Group key={row.id} style={rowStyles} align="flex-end">
+                <Group 
+                  key={row.id} 
+                  style={rowStyles} 
+                  align="flex-end"
+                >
                   <Box style={{ flex: 1 }}>
                     <CurrencySelector
                       placeholder="Select currency"
@@ -709,41 +715,68 @@ const CurrencyConverter = () => {
                       placeholder="0"
                     />
                   </Box>
-                  <ActionIcon
-                    color="red"
-                    variant="subtle"
-                    onClick={() => removeCurrency(index + 1)}
-                    style={{ marginTop: 0 }}
-                  >
-                    <IconTrash size={20} />
-                  </ActionIcon>
+                  {deleteMode && (
+                    <ActionIcon
+                      color="red"
+                      variant="subtle"
+                      onClick={() => removeCurrency(index + 1)}
+                      style={{ 
+                        marginTop: 0,
+                        opacity: 1,
+                        transition: 'opacity 0.2s ease'
+                      }}
+                    >
+                      <IconTrash size={20} />
+                    </ActionIcon>
+                  )}
                 </Group>
               ))}
             </Stack>
           </ScrollArea>
         </Box>
 
-        {/* Add Currency Button - FIXED at bottom */}
-        {rows.length < CURRENCIES.length && (
+        {/* Action Buttons - FIXED at bottom */}
+        <Group gap="xs" style={{ marginTop: '16px' }}>
+          {rows.length < CURRENCIES.length && (
+            <Button
+              leftSection={<IconPlus size={20} />}
+              variant="subtle"
+              onClick={addCurrency}
+              style={{
+                backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                color: '#00ffff',
+                borderRadius: '8px',
+                border: '1px solid rgba(0, 255, 255, 0.2)',
+                flex: 1,
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                  borderColor: 'rgba(0, 255, 255, 0.4)',
+                }
+              }}
+            >
+              Add Currency
+            </Button>
+          )}
+          
           <Button
-            leftSection={<IconPlus size={20} />}
+            leftSection={<IconTrash size={20} />}
             variant="subtle"
-            onClick={addCurrency}
-            fullWidth
+            onClick={() => setDeleteMode(!deleteMode)}
             style={{
-              backgroundColor: 'rgba(0, 255, 255, 0.1)',
-              color: '#00ffff',
+              backgroundColor: deleteMode ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+              color: deleteMode ? '#ff4444' : 'rgba(255, 255, 255, 0.7)',
               borderRadius: '8px',
-              border: '1px solid rgba(0, 255, 255, 0.2)',
+              border: `1px solid ${deleteMode ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.2)'}`,
+              flex: 1,
               '&:hover': {
-                backgroundColor: 'rgba(0, 255, 255, 0.2)',
-                borderColor: 'rgba(0, 255, 255, 0.4)',
+                backgroundColor: deleteMode ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.2)',
+                borderColor: deleteMode ? 'rgba(255, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.3)',
               }
             }}
           >
-            Add Currency
+            {deleteMode ? 'Cancel Delete' : 'Delete'}
           </Button>
-        )}
+        </Group>
       </Box>
     </Box>
   );
