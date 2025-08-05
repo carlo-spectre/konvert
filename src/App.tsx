@@ -114,7 +114,7 @@ const App = () => {
         bg="black" 
         style={{ 
           minHeight: '100vh',
-          minWidth: '100vw',
+          width: '100%',
           margin: 0,
           padding: isMobile ? '1rem' : '2rem',
           background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
