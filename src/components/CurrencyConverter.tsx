@@ -681,32 +681,32 @@ const CurrencyConverter = () => {
                   </ActionIcon>
                 </Group>
               ))}
+              
+              {/* Add Currency Button - INSIDE the ScrollArea */}
+              {rows.length < CURRENCIES.length && (
+                <Button
+                  leftSection={<IconPlus size={20} />}
+                  variant="subtle"
+                  onClick={addCurrency}
+                  fullWidth
+                  style={{
+                    backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                    color: '#00ffff',
+                    marginTop: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0, 255, 255, 0.2)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                      borderColor: 'rgba(0, 255, 255, 0.4)',
+                    }
+                  }}
+                >
+                  Add Currency
+                </Button>
+              )}
             </Stack>
           </ScrollArea>
         </Box>
-        
-        {/* Add Currency Button - INSIDE the container */}
-        {rows.length < CURRENCIES.length && (
-          <Button
-            leftSection={<IconPlus size={20} />}
-            variant="subtle"
-            onClick={addCurrency}
-            fullWidth
-            style={{
-              backgroundColor: 'rgba(0, 255, 255, 0.1)',
-              color: '#00ffff',
-              marginTop: '16px',
-              borderRadius: '8px',
-              border: '1px solid rgba(0, 255, 255, 0.2)',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 255, 255, 0.2)',
-                borderColor: 'rgba(0, 255, 255, 0.4)',
-              }
-            }}
-          >
-            Add Currency
-          </Button>
-        )}
       </Box>
     </Box>
   );

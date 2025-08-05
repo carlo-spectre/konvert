@@ -117,13 +117,9 @@ const App = () => {
           minWidth: '100vw',
           margin: 0,
           padding: isMobile ? '1rem' : '2rem',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
           background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
           fontFamily: 'Orbitron, sans-serif',
+          overflowX: 'hidden',
         }}
       >
         <AnimatedBackground />
@@ -136,7 +132,7 @@ const App = () => {
             // Mobile layout with tabs
             <Tabs 
               defaultValue="converter" 
-              style={{ marginTop: '2rem', marginBottom: '2rem' }}
+              style={{ marginTop: '2rem' }}
               styles={{
                 panel: {
                   border: 'none !important',
