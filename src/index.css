@@ -21,7 +21,6 @@ html {
   background: #000;
   min-height: 100vh;
   min-width: 100vw;
-  overflow: hidden;
 }
 
 body {
@@ -31,7 +30,6 @@ body {
   min-width: 100vw;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 #root {
@@ -39,12 +37,18 @@ body {
   min-height: 100vh;
   width: 100vw;
   padding: 2rem;
-  overflow: hidden;
 }
 
 @media (max-width: 768px) {
   #root {
     padding: 1rem;
+    overflow-y: auto;
+    height: auto;
+  }
+  
+  html, body {
+    overflow-y: auto;
+    height: auto;
   }
   
   .currency-layout {
@@ -54,6 +58,22 @@ body {
   .currency-layout > div {
     flex: 1 !important;
     width: 100%;
+  }
+
+  /* Ensure buttons are large enough for touch */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improve scrolling on mobile */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure proper spacing for mobile */
+  .mantine-Tabs-panel {
+    padding-bottom: 2rem;
   }
 }
 
