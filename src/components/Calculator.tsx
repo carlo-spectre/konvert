@@ -9,31 +9,71 @@ interface HistoryItem {
 
 interface CalculatorProps {
   onHistoryUpdate?: (history: HistoryItem[]) => void;
+  selectedExpression?: string;
+  onExpressionSelected?: () => void;
 }
 
-const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
+const Calculator = ({ onHistoryUpdate, selectedExpression, onExpressionSelected }: CalculatorProps) => {
 
 
   const [display, setDisplay] = useState('0');
+  const [currentExpression, setCurrentExpression] = useState('');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [lastOperation, setLastOperation] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const calculatorRef = useRef<HTMLDivElement>(null);
 
+  // Handle selected expression from history
+  useEffect(() => {
+    if (selectedExpression && selectedExpression !== display) {
+      setCurrentExpression(selectedExpression);
+      // Find the result for this expression from history
+      const historyItem = history.find(item => item.expression === selectedExpression);
+      if (historyItem) {
+        setDisplay(historyItem.result);
+      } else {
+        setDisplay(selectedExpression);
+      }
+      onExpressionSelected?.(); // Clear the selection after using it
+    }
+  }, [selectedExpression, onExpressionSelected, history]);
+
+  const formatExpression = (expression: string) => {
+    // Split the expression by operators and format each number
+    const parts = expression.split(/(\s[+\-×÷]\s)/);
+    return parts.map(part => {
+      // If it's an operator, return as is
+      if (/^\s[+\-×÷]\s$/.test(part)) {
+        return part;
+      }
+      // If it's a number, format it
+      const cleanPart = part.replace(/,/g, '');
+      const num = parseFloat(cleanPart);
+      if (!isNaN(num)) {
+        return num.toLocaleString();
+      }
+      return part;
+    }).join('');
+  };
+
   const handleNumber = (num: string) => {
     setDisplay(prev => {
       if (prev === '0') {
+        setCurrentExpression(num);
         return num;
       }
       
       // If we're in the middle of an expression, just add the number
       if (prev.includes(' ')) {
-        return prev + num;
+        const newDisplay = prev + num;
+        setCurrentExpression(newDisplay);
+        return formatExpression(newDisplay);
       }
       
       // If it's just a single number, add to it and format
       const cleanPrev = prev.replace(/,/g, '');
       const newNumber = cleanPrev + num;
+      setCurrentExpression(newNumber);
       return Number(newNumber).toLocaleString();
     });
   };
@@ -44,11 +84,14 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
         display.endsWith(' × ') || display.endsWith(' ÷ ')) {
       return;
     }
+    const newExpression = display + ' ' + op + ' ';
+    setCurrentExpression(newExpression);
     setDisplay(prev => prev + ' ' + op + ' ');
   };
 
   const handleClear = () => {
     setDisplay('0');
+    setCurrentExpression('');
     setLastOperation(null);
   };
 
@@ -98,22 +141,17 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
       // Add to history
       const newHistory = [{
         expression: expressionToEvaluate,
-        result,
+        result: result,
         timestamp: new Date()
-      }, ...history].slice(0, 10);
-      
+      }, ...history.slice(0, 9)]; // Keep only last 10 items
+
       setHistory(newHistory);
+      onHistoryUpdate?.(newHistory);
       
-      // Notify parent component of history update
-      if (onHistoryUpdate) {
-        onHistoryUpdate(newHistory);
-      }
-      
-      // Store last operation with formatted result
+      // Update display with result and keep expression visible
       setLastOperation(expressionToEvaluate + ' = ' + Number(result).toLocaleString());
-      
-      // Set result as new display with formatting
       setDisplay(Number(result).toLocaleString());
+      // Don't clear currentExpression so it stays visible on top
     } catch (error) {
       console.error('Calculation error:', error);
       setDisplay('Error');
@@ -204,12 +242,12 @@ const Calculator = ({ onHistoryUpdate }: CalculatorProps) => {
           justifyContent: 'center',
         }}
       >
-        {lastOperation && (
-          <Text size="xs" c="gray.4" style={{ marginBottom: '8px' }}>
-            {lastOperation}
+        {currentExpression && (
+          <Text size="sm" c="gray.4" style={{ marginBottom: '8px', textAlign: 'right' }}>
+            {currentExpression}
           </Text>
         )}
-        <Text size="xl" c="gray.0" style={{ wordBreak: 'break-all', fontSize: '24px' }}>
+        <Text size="xl" c="gray.0" style={{ wordBreak: 'break-all', fontSize: '24px', textAlign: 'right' }}>
           {display}
         </Text>
       </Box>

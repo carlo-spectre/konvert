@@ -9,9 +9,10 @@ interface HistoryItem {
 
 interface HistoryPanelProps {
   history?: HistoryItem[];
+  onHistoryClick?: (expression: string) => void;
 }
 
-const HistoryPanel = ({ history = [] }: HistoryPanelProps) => {
+const HistoryPanel = ({ history = [], onHistoryClick }: HistoryPanelProps) => {
   return (
     <Box
       style={{
@@ -29,40 +30,69 @@ const HistoryPanel = ({ history = [] }: HistoryPanelProps) => {
       </Text>
 
       <Box style={{ height: '400px', overflow: 'hidden' }}>
-        <ScrollArea h={400} type="scroll">
+        <ScrollArea 
+          h={400} 
+          type="scroll"
+          offsetScrollbars
+          styles={{
+            scrollbar: {
+              backgroundColor: 'rgba(0, 255, 255, 0.2)',
+              border: '1px solid rgba(0, 255, 255, 0.3)',
+              borderRadius: '4px',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 255, 255, 0.4)',
+              }
+            },
+            thumb: {
+              backgroundColor: 'rgba(0, 255, 255, 0.6)',
+              borderRadius: '4px',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 255, 255, 0.8)',
+              }
+            },
+            viewport: {
+              paddingRight: '8px'
+            }
+          }}
+        >
           <Box>
-            {history.length > 0 && (
-              <Box mb="xs">
-                <Group gap="md" align="center" style={{ opacity: 0.7 }}>
-                  <Text size="xs" style={{ minWidth: 90, color: '#fff' }}>Expression</Text>
-                  <Text size="xs" style={{ minWidth: 36, textAlign: 'center', color: '#fff' }}>Result</Text>
-                  <Text size="xs" style={{ minWidth: 70, textAlign: 'right', marginLeft: 'auto', color: '#fff' }}>Time</Text>
-                </Group>
-              </Box>
-            )}
             {history.map((item, idx) => (
-              <Group
+              <Box
                 key={idx}
-                align="center"
-                gap="md"
                 style={{
                   borderBottom: '1px solid rgba(255,255,255,0.07)',
-                  padding: '4px 0',
+                  padding: '12px 0',
                   margin: 0,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onClick={() => onHistoryClick?.(item.expression)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
-                <Tooltip label={item.expression}>
-                  <Text size="sm" style={{ minWidth: 90, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {item.expression}
+                <Group align="flex-start" gap="md">
+                  {/* Timestamp on the left */}
+                  <Text size="xs" c="dimmed" style={{ minWidth: 70, color: '#fff', marginTop: '4px' }}>
+                    {new Date(item.timestamp).toLocaleTimeString()}
                   </Text>
-                </Tooltip>
-                <Text fw={700} size="md" style={{ color: '#fff', minWidth: 36, textAlign: 'center' }}>
-                  {Number(item.result).toLocaleString()}
-                </Text>
-                <Text size="xs" c="dimmed" style={{ marginLeft: 'auto', minWidth: 70, textAlign: 'right', color: '#fff' }}>
-                  {new Date(item.timestamp).toLocaleTimeString()}
-                </Text>
-              </Group>
+                  
+                  {/* Expression and result on the right */}
+                  <Box style={{ flex: 1 }}>
+                    <Tooltip label={item.expression}>
+                      <Text size="xs" style={{ color: '#fff', opacity: 0.8, marginBottom: '4px', textAlign: 'right' }}>
+                        {item.expression}
+                      </Text>
+                    </Tooltip>
+                    <Text fw={700} size="md" style={{ color: '#fff', textAlign: 'right' }}>
+                      {Number(item.result).toLocaleString()}
+                    </Text>
+                  </Box>
+                </Group>
+              </Box>
             ))}
             {history.length === 0 && (
               <Text size="sm" c="dimmed" ta="center" mt="xl">

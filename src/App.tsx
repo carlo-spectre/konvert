@@ -69,7 +69,12 @@ const theme = createTheme({
 
 const App = () => {
   const [calculatorHistory, setCalculatorHistory] = useState<HistoryItem[]>([]);
+  const [selectedHistoryExpression, setSelectedHistoryExpression] = useState<string>('');
   const isMobile = useMediaQuery('(max-width: 768px)');
+
+  const handleHistoryClick = (expression: string) => {
+    setSelectedHistoryExpression(expression);
+  };
 
   return (
     <MantineProvider theme={theme}>
@@ -194,13 +199,20 @@ const App = () => {
 
               <Tabs.Panel value="calculator">
                 <Box style={{ width: '100%', height: '400px' }}>
-                  <Calculator onHistoryUpdate={setCalculatorHistory} />
+                  <Calculator 
+                    onHistoryUpdate={setCalculatorHistory} 
+                    selectedExpression={selectedHistoryExpression}
+                    onExpressionSelected={() => setSelectedHistoryExpression('')}
+                  />
                 </Box>
               </Tabs.Panel>
 
               <Tabs.Panel value="history">
                 <Box style={{ width: '100%', height: '400px' }}>
-                  <HistoryPanel history={calculatorHistory} />
+                  <HistoryPanel 
+                    history={calculatorHistory} 
+                    onHistoryClick={handleHistoryClick}
+                  />
                 </Box>
               </Tabs.Panel>
             </Tabs>
@@ -211,10 +223,17 @@ const App = () => {
                 <CurrencyConverter />
               </Box>
               <Box style={{ width: '400px', height: '500px' }}>
-                <Calculator onHistoryUpdate={setCalculatorHistory} />
+                <Calculator 
+                  onHistoryUpdate={setCalculatorHistory} 
+                  selectedExpression={selectedHistoryExpression}
+                  onExpressionSelected={() => setSelectedHistoryExpression('')}
+                />
               </Box>
               <Box style={{ width: '400px', height: '500px' }}>
-                <HistoryPanel history={calculatorHistory} />
+                <HistoryPanel 
+                  history={calculatorHistory} 
+                  onHistoryClick={handleHistoryClick}
+                />
               </Box>
             </Group>
           )}

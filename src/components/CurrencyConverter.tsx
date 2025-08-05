@@ -35,12 +35,13 @@ const containerStyles = {
 };
 
 const rowStyles = {
-  background: 'rgba(255, 255, 255, 0.02)',
+  background: 'transparent',
   borderRadius: '12px',
-  padding: '12px',
+  padding: '0',
+  marginBottom: '12px',
   transition: 'all 0.2s ease',
   '&:hover': {
-    background: 'rgba(255, 255, 255, 0.03)',
+    background: 'rgba(255, 255, 255, 0.02)',
     transform: 'translateY(-1px)'
   }
 };
@@ -559,6 +560,10 @@ const CurrencyConverter = () => {
                     handleAmountChange(numValue, 0);
                   }
                 }}
+                onClick={(e) => {
+                  // Clear the input when clicked/tapped
+                  (e.target as HTMLInputElement).select();
+                }}
                 style={{
                   width: '100%',
                   background: 'rgba(0, 0, 0, 0.2)',
@@ -576,6 +581,8 @@ const CurrencyConverter = () => {
                 onFocus={(e) => {
                   e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
                   e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  // Select all text on focus
+                  (e.target as HTMLInputElement).select();
                 }}
                 onBlur={(e) => {
                   e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
@@ -589,7 +596,27 @@ const CurrencyConverter = () => {
 
         {/* Scrollable area for additional currencies - fills remaining space */}
         <Box style={{ flex: 1, overflow: 'hidden' }}>
-          <ScrollArea h="100%" type="scroll">
+          <ScrollArea 
+            h="100%" 
+            type="scroll"
+            styles={{
+              scrollbar: {
+                backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                border: '1px solid rgba(0, 255, 255, 0.3)',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 255, 255, 0.4)',
+                }
+              },
+              thumb: {
+                backgroundColor: 'rgba(0, 255, 255, 0.6)',
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 255, 255, 0.8)',
+                }
+              }
+            }}
+          >
             <Stack gap="md">
               {/* All Additional Currencies */}
               {additionalCurrencies.map((row, index) => (
@@ -613,6 +640,10 @@ const CurrencyConverter = () => {
                           handleAmountChange(numValue, index + 1);
                         }
                       }}
+                      onClick={(e) => {
+                        // Clear the input when clicked/tapped
+                        (e.target as HTMLInputElement).select();
+                      }}
                       style={{
                         width: '100%',
                         background: 'rgba(0, 0, 0, 0.2)',
@@ -630,6 +661,8 @@ const CurrencyConverter = () => {
                       onFocus={(e) => {
                         e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
                         e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                        // Select all text on focus
+                        (e.target as HTMLInputElement).select();
                       }}
                       onBlur={(e) => {
                         e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
