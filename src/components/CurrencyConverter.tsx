@@ -552,6 +552,7 @@ const CurrencyConverter = () => {
               </Text>
               <input
                 type="text"
+                inputMode="numeric"
                 value={formatDisplay(baseCurrency.amount)}
                 onChange={(e) => {
                   const cleanValue = e.target.value.replace(/,/g, '');
@@ -632,6 +633,7 @@ const CurrencyConverter = () => {
                   <Box style={{ flex: 1 }}>
                     <input
                       type="text"
+                      inputMode="numeric"
                       value={formatDisplay(row.amount)}
                       onChange={(e) => {
                         const cleanValue = e.target.value.replace(/,/g, '');
