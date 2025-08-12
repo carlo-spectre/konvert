@@ -1,4 +1,4 @@
-import { MantineProvider, Box, createTheme, Group, Tabs, ActionIcon, Text } from '@mantine/core'
+import { MantineProvider, Box, createTheme, Group, ActionIcon, Text } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import CurrencyConverter from './components/CurrencyConverter'
 import Calculator from './components/Calculator'
@@ -7,7 +7,7 @@ import GlitchTitle from './components/GlitchTitle'
 import StockTicker from './components/StockTicker'
 import CryptoTicker from './components/CryptoTicker'
 import HistoryPanel from './components/HistoryPanel'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import '@mantine/core/styles.css'
 
@@ -72,7 +72,15 @@ const App = () => {
   const [calculatorHistory, setCalculatorHistory] = useState<HistoryItem[]>([]);
   const [selectedHistoryExpression, setSelectedHistoryExpression] = useState<string>('');
   const [showMobileTickers, setShowMobileTickers] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>('converter');
   const isMobile = useMediaQuery('(max-width: 768px)');
+
+  // Ensure initial state is properly applied
+  useEffect(() => {
+    // Force a re-render to ensure initial styling is applied
+    setActiveTab('converter');
+    console.log('Initial activeTab set to:', 'converter');
+  }, []);
 
   const handleHistoryClick = (expression: string) => {
     setSelectedHistoryExpression(expression);
@@ -106,22 +114,37 @@ const App = () => {
             display: none !important;
           }
           
-          /* Keep only the active tab indicator */
-          .mantine-Tabs-tab[data-active] {
-            border-bottom: 2px solid #00ffff !important;
+          /* Custom tab styles - removed old Mantine overrides */
+          
+          /* Custom scrollbar that's always visible */
+          .always-visible-scrollbar {
+            overflow-y: scroll !important;
           }
           
-          /* Mobile tab styles */
-          .mantine-Tabs-tab {
-            color: rgba(255, 255, 255, 0.5) !important;
+          .always-visible-scrollbar::-webkit-scrollbar {
+            width: 12px !important;
+            background: rgba(0, 0, 0, 0.2) !important;
           }
           
-          .mantine-Tabs-tab[data-active] {
-            color: #00ffff !important;
+          .always-visible-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2) !important;
+            border-radius: 6px !important;
           }
           
-          .mantine-Tabs-tab:hover {
-            color: rgba(255, 255, 255, 0.7) !important;
+          .always-visible-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.6) !important;
+            border-radius: 6px !important;
+            border: 2px solid rgba(0, 0, 0, 0.2) !important;
+          }
+          
+          .always-visible-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 255, 0.8) !important;
+          }
+          
+          /* Firefox scrollbar */
+          .always-visible-scrollbar {
+            scrollbar-width: thin !important;
+            scrollbar-color: rgba(0, 255, 255, 0.6) rgba(0, 0, 0, 0.2) !important;
           }
         `}
       </style>
@@ -183,51 +206,118 @@ const App = () => {
           
           <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             {isMobile ? (
-            // Mobile layout with tabs
-            <Tabs 
-              defaultValue="converter" 
-              style={{ marginTop: '2rem' }}
-              styles={{
-                panel: {
-                  border: 'none !important',
-                  background: 'transparent !important',
-                  boxShadow: 'none !important',
-                  outline: 'none !important',
-                },
-                list: {
-                  justifyContent: 'center',
+              // Mobile layout with custom tabs
+              /* Custom Tab Navigation */
+            <Box style={{ marginTop: '2rem' }}>
+              {/* Tab Headers */}
+              <Box 
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
                   marginBottom: '2rem',
+                  gap: '0',
                   background: 'transparent',
                   borderRadius: '12px',
-                  padding: '4px',
-                  border: 'none',
-                },
-
-                root: {
-                  border: 'none !important',
-                  outline: 'none !important',
-                }
-              }}
-            >
-              <Tabs.List>
-                <Tabs.Tab value="converter">
+                  padding: '4px'
+                }}
+              >
+                <Box
+                  onClick={() => {
+                    console.log('Converter clicked, setting activeTab to converter');
+                    setActiveTab('converter');
+                  }}
+                  style={{
+                    cursor: 'pointer',
+                    padding: '8px 12px',
+                    color: (activeTab === 'converter' || activeTab === '' || activeTab === undefined) ? '#00ffff' : 'rgba(255, 255, 255, 0.5)',
+                    borderBottom: (activeTab === 'converter' || activeTab === '' || activeTab === undefined) ? '2px solid #00ffff' : '2px solid transparent',
+                    transition: 'all 0.1s ease',
+                    fontSize: '0.8rem',
+                    fontWeight: 500,
+                    userSelect: 'none',
+                    border: 'none',
+                    background: 'transparent'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== 'converter') {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== 'converter') {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
+                    }
+                  }}
+                >
                   Converter
-                </Tabs.Tab>
-                <Tabs.Tab value="calculator">
+                </Box>
+                
+                <Box
+                  onClick={() => setActiveTab('calculator')}
+                  style={{
+                    cursor: 'pointer',
+                    padding: '8px 12px',
+                    color: activeTab === 'calculator' ? '#00ffff' : 'rgba(255, 255, 255, 0.5)',
+                    borderBottom: activeTab === 'calculator' ? '2px solid #00ffff' : '2px solid transparent',
+                    transition: 'all 0.1s ease',
+                    fontSize: '0.8rem',
+                    fontWeight: 500,
+                    userSelect: 'none',
+                    border: 'none',
+                    background: 'transparent'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== 'calculator') {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== 'calculator') {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
+                    }
+                  }}
+                >
                   Calculator
-                </Tabs.Tab>
-                <Tabs.Tab value="history">
-                  History
-                </Tabs.Tab>
-              </Tabs.List>
+                </Box>
+                
+                <Box
+                  onClick={() => setActiveTab('history')}
+                  style={{
+                    cursor: 'pointer',
+                    padding: '8px 12px',
 
-              <Tabs.Panel value="converter">
+                    color: activeTab === 'history' ? '#00ffff' : 'rgba(255, 255, 255, 0.5)',
+                    borderBottom: activeTab === 'history' ? '2px solid #00ffff' : '2px solid transparent',
+                    transition: 'all 0.1s ease',
+                    fontSize: '0.8rem',
+                    fontWeight: 500,
+                    userSelect: 'none',
+                    border: 'none',
+                    background: 'transparent'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== 'history') {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== 'history') {
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
+                    }
+                  }}
+                >
+                  History
+                </Box>
+              </Box>
+
+              {/* Tab Content */}
+              {activeTab === 'converter' && (
                 <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
                   <CurrencyConverter />
                 </Box>
-              </Tabs.Panel>
-
-              <Tabs.Panel value="calculator">
+              )}
+              
+              {activeTab === 'calculator' && (
                 <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
                   <Calculator 
                     onHistoryUpdate={setCalculatorHistory} 
@@ -235,17 +325,17 @@ const App = () => {
                     onExpressionSelected={() => setSelectedHistoryExpression('')}
                   />
                 </Box>
-              </Tabs.Panel>
-
-              <Tabs.Panel value="history">
+              )}
+              
+              {activeTab === 'history' && (
                 <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
                   <HistoryPanel 
                     history={calculatorHistory} 
                     onHistoryClick={handleHistoryClick}
                   />
                 </Box>
-              </Tabs.Panel>
-            </Tabs>
+              )}
+            </Box>
           ) : (
             // Desktop layout with horizontal panels
             <Group align="flex-start" justify="space-between" gap="xs" style={{ width: '100%' }}>

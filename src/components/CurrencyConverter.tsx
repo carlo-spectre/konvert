@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Select, NumberInput, Button, Group, Stack, ActionIcon, Divider, Text, ScrollArea, Tabs } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconTrash, IconPlus, IconChevronDown, IconCurrencyDollar, IconCurrencyEuro, IconCurrencyPound, IconCurrencyYen, IconCurrencyDollarOff, IconCurrencyBitcoin, IconCurrencyEthereum, IconFlag, IconSearch } from '@tabler/icons-react';
 
 const FIAT_CURRENCIES = [
@@ -133,6 +134,7 @@ interface CurrencyRow {
 }
 
 const CurrencyConverter = () => {
+  const isMobile = useMediaQuery('(max-width: 768px)');
   // Simple formatter for display
   const formatDisplay = (value: number) => {
     if (value === 0) return '';
@@ -164,6 +166,24 @@ const CurrencyConverter = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'fiat' | 'crypto'>('fiat');
     const [searchTerm, setSearchTerm] = useState('');
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Handle clicks outside dropdown
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setIsOpen(false);
+        }
+      };
+
+      if (isOpen) {
+        document.addEventListener('mousedown', handleClickOutside);
+      }
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [isOpen]);
 
     const availableFiat = FIAT_CURRENCIES.filter(c => 
       c.value === value || !rows.some(r => r.currency === c.value)
@@ -215,17 +235,19 @@ const CurrencyConverter = () => {
         {/* Dropdown with Tabs */}
         {isOpen && (
           <Box
+            ref={dropdownRef}
             style={{
               position: 'absolute',
               top: '100%',
               left: 0,
               right: 0,
               zIndex: 1000,
-              background: 'rgba(0, 0, 0, 0.95)',
+              background: '#000000',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '8px',
               marginTop: '4px',
-              backdropFilter: 'blur(10px)',
+              maxHeight: '300px',
+              overflow: 'hidden',
             }}
           >
             <Tabs value={activeTab} onChange={(val) => setActiveTab(val as 'fiat' | 'crypto')}>
@@ -238,9 +260,20 @@ const CurrencyConverter = () => {
                 <Tabs.Tab 
                   value="fiat" 
                   style={{ 
-                    color: '#00ffff', 
+                    color: activeTab === 'fiat' ? '#00ffff' : 'rgba(255, 255, 255, 0.6)', 
                     fontSize: '0.8rem',
-                    padding: '8px 12px'
+                    padding: '8px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)';
+                    e.currentTarget.style.color = '#00ffff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = activeTab === 'fiat' ? '#00ffff' : 'rgba(255, 255, 255, 0.6)';
                   }}
                 >
                   Fiat
@@ -248,16 +281,34 @@ const CurrencyConverter = () => {
                 <Tabs.Tab 
                   value="crypto" 
                   style={{ 
-                    color: '#ff00ff', 
+                    color: activeTab === 'crypto' ? '#00ffff' : 'rgba(255, 255, 255, 0.6)', 
                     fontSize: '0.8rem',
-                    padding: '8px 12px'
+                    padding: '8px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)';
+                    e.currentTarget.style.color = '#00ffff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = activeTab === 'crypto' ? '#00ffff' : 'rgba(255, 255, 255, 0.6)';
                   }}
                 >
                   Crypto
                 </Tabs.Tab>
               </Tabs.List>
 
-                                        <Tabs.Panel value="fiat" style={{ padding: '12px' }}>
+                                        <Tabs.Panel value="fiat" style={{ 
+                                          padding: '12px', 
+                                          maxHeight: '200px', 
+                                          overflowY: 'scroll',
+                                          scrollbarWidth: 'thin',
+                                          scrollbarColor: 'rgba(0, 255, 255, 0.3) transparent',
+                                          borderRight: '1px solid rgba(0, 255, 255, 0.2)'
+                                        }} className="always-visible-scrollbar">
                 <Stack gap={6}>
                   {/* Search Input */}
                   <Box
@@ -284,7 +335,7 @@ const CurrencyConverter = () => {
                       onChange={(e) => setSearchTerm(e.target.value)}
                       style={{
                         width: '100%',
-                        background: 'rgba(0, 0, 0, 0.3)',
+                        background: '#000000',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         borderRadius: '6px',
                         padding: '8px 12px 8px 36px',
@@ -332,7 +383,14 @@ const CurrencyConverter = () => {
                 </Stack>
               </Tabs.Panel>
 
-              <Tabs.Panel value="crypto" style={{ padding: '12px' }}>
+              <Tabs.Panel value="crypto" style={{ 
+                padding: '12px', 
+                maxHeight: '200px', 
+                overflowY: 'scroll',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(0, 255, 255, 0.3) transparent',
+                borderRight: '1px solid rgba(0, 255, 255, 0.2)'
+              }} className="always-visible-scrollbar">
                 <Stack gap={6}>
                   {/* Search Input */}
                   <Box
@@ -359,7 +417,7 @@ const CurrencyConverter = () => {
                       onChange={(e) => setSearchTerm(e.target.value)}
                       style={{
                         width: '100%',
-                        background: 'rgba(0, 0, 0, 0.3)',
+                        background: '#000000',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         borderRadius: '6px',
                         padding: '8px 12px 8px 36px',
@@ -516,9 +574,26 @@ const CurrencyConverter = () => {
       // If changing other amounts, reverse calculate the base amount
       const targetCurrency = newRows[index].currency;
       const baseCurrency = newRows[0].currency;
-      const newBaseAmount = calculateAmount(numValue, targetCurrency, baseCurrency, rates);
-      newRows[0] = { ...newRows[0], amount: newBaseAmount };
-      setRows(updateConversions(newRows));
+      
+      // Check if we have valid rates for both currencies
+      if (rates[targetCurrency] && rates[baseCurrency]) {
+        const newBaseAmount = calculateAmount(numValue, targetCurrency, baseCurrency, rates);
+        newRows[0] = { ...newRows[0], amount: newBaseAmount };
+        
+        // Update all other rows EXCEPT the one being edited
+        const updatedRows = newRows.map((row, i) => {
+          if (i === 0 || i === index) return row; // Keep base and edited row unchanged
+          return {
+            ...row,
+            amount: calculateAmount(newBaseAmount, baseCurrency, row.currency, rates)
+          };
+        });
+        
+        setRows(updatedRows);
+      } else {
+        // If rates are not available, just update the current row
+        setRows(newRows);
+      }
     }
   };
 
@@ -754,7 +829,7 @@ const CurrencyConverter = () => {
                 }
               }}
             >
-              Add Currency
+              {isMobile ? 'Add' : 'Add Currency'}
             </Button>
           )}
           
