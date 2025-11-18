@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Select, NumberInput, Button, Group, Stack, ActionIcon, Divider, Text, ScrollArea, Tabs, Modal, Portal, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconTrash, IconPlus, IconChevronDown, IconCurrencyDollar, IconCurrencyEuro, IconCurrencyPound, IconCurrencyYen, IconCurrencyDollarOff, IconCurrencyBitcoin, IconCurrencyEthereum, IconFlag, IconSearch } from '@tabler/icons-react';
+import { IconTrash, IconPlus, IconChevronDown, IconCurrencyDollar, IconCurrencyEuro, IconCurrencyPound, IconCurrencyYen, IconCurrencyDollarOff, IconCurrencyBitcoin, IconCurrencyEthereum, IconFlag, IconSearch, IconX } from '@tabler/icons-react';
 
 const FIAT_CURRENCIES = [
   { label: 'AED', value: 'AED', flag: '🇦🇪', country: 'United Arab Emirates', aliases: ['UAE', 'Emirates'] },
@@ -520,6 +520,7 @@ const CurrencyConverter = () => {
             position="bottom"
             size="100%"
             overlayProps={{ opacity: 0.5, color: '#000000', blur: 0 }}
+            withCloseButton={false}
             styles={{
               content: {
                 background: '#000000',
@@ -535,8 +536,27 @@ const CurrencyConverter = () => {
               background: '#000000', 
               height: '100%',
               borderRadius: '16px 16px 0 0',
-              padding: '20px 0 0 0'
+              padding: '20px 0 0 0',
+              position: 'relative',
+              fontFamily: '"Orbitron", sans-serif'
             }}>
+              <ActionIcon
+                aria-label="Close currency picker"
+                variant="light"
+                onClick={() => setIsModalOpen(false)}
+                style={{
+                  position: 'absolute',
+                  top: 12,
+                  right: 12,
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  borderRadius: '50%',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#00ffff',
+                  zIndex: 20
+                }}
+              >
+                <IconX size={16} />
+              </ActionIcon>
               <Box style={{
                 width: '40px',
                 height: '4px',
@@ -549,7 +569,8 @@ const CurrencyConverter = () => {
                   background: 'rgba(255, 255, 255, 0.05)', 
                   border: 'none',
                   justifyContent: 'center',
-                  display: 'flex'
+                  display: 'flex',
+                  fontFamily: '"Orbitron", sans-serif'
                 }}>
                   <Tabs.Tab 
                     value="fiat" 
@@ -619,7 +640,8 @@ const CurrencyConverter = () => {
                           padding: '10px 12px 10px 36px',
                           fontSize: '1rem',
                           color: '#ffffff',
-                          outline: 'none'
+                          outline: 'none',
+                          fontFamily: '"Orbitron", sans-serif'
                         }}
                       />
                     </Box>
@@ -694,7 +716,8 @@ const CurrencyConverter = () => {
                           padding: '10px 12px 10px 36px',
                           fontSize: '1rem',
                           color: '#ffffff',
-                          outline: 'none'
+                          outline: 'none',
+                          fontFamily: '"Orbitron", sans-serif'
                         }}
                       />
                     </Box>

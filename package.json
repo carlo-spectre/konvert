@@ -1,6 +1,6 @@
 {
   "name": "konvert",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "A modern currency converter with real-time rates",
   "private": true,
   "type": "module",
