@@ -519,18 +519,21 @@ const CurrencyConverter = () => {
             onClose={() => setIsModalOpen(false)}
             position="bottom"
             size="100%"
-            overlayProps={{ opacity: 0.25, blur: 0 }}
+            overlayProps={{ opacity: 0.5, color: '#000000', blur: 0 }}
             styles={{
               content: {
                 background: '#000000',
                 borderTopLeftRadius: '16px',
                 borderTopRightRadius: '16px',
+                height: '55vh',
+                maxHeight: '65vh',
+                padding: 0,
               }
             }}
           >
             <Box style={{ 
               background: '#000000', 
-              height: '70vh',
+              height: '100%',
               borderRadius: '16px 16px 0 0',
               padding: '20px 0 0 0'
             }}>
