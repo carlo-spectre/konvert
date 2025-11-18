@@ -15,6 +15,7 @@ interface HistoryPanelProps {
 const HistoryPanel = ({ history = [], onHistoryClick }: HistoryPanelProps) => {
   return (
     <Box
+      className="panel panel-history"
       style={{
         background: 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
         backdropFilter: 'blur(10px)',
@@ -22,6 +23,7 @@ const HistoryPanel = ({ history = [], onHistoryClick }: HistoryPanelProps) => {
         padding: '24px',
         border: '1px solid rgba(255,255,255,0.1)',
         width: '100%',
+        maxWidth: '420px',
         height: '100%',
       }}
     >

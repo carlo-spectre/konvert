@@ -1,7 +1,8 @@
 {
   "name": "konvert",
+  "version": "1.4.2",
+  "description": "A modern currency converter with real-time rates",
   "private": true,
-  "version": "1.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

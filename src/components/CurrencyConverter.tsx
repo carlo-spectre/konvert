@@ -1,42 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Select, NumberInput, Button, Group, Stack, ActionIcon, Divider, Text, ScrollArea, Tabs } from '@mantine/core';
+import { Box, Select, NumberInput, Button, Group, Stack, ActionIcon, Divider, Text, ScrollArea, Tabs, Modal, Portal, Drawer } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconTrash, IconPlus, IconChevronDown, IconCurrencyDollar, IconCurrencyEuro, IconCurrencyPound, IconCurrencyYen, IconCurrencyDollarOff, IconCurrencyBitcoin, IconCurrencyEthereum, IconFlag, IconSearch } from '@tabler/icons-react';
 
 const FIAT_CURRENCIES = [
-  { label: 'AED', value: 'AED', flag: '🇦🇪' },
-  { label: 'AUD', value: 'AUD', flag: '🇦🇺' },
-  { label: 'BRL', value: 'BRL', flag: '🇧🇷' },
-  { label: 'CAD', value: 'CAD', flag: '🇨🇦' },
-  { label: 'CHF', value: 'CHF', flag: '🇨🇭' },
-  { label: 'CNY', value: 'CNY', flag: '🇨🇳' },
-  { label: 'CZK', value: 'CZK', flag: '🇨🇿' },
-  { label: 'DKK', value: 'DKK', flag: '🇩🇰' },
-  { label: 'EUR', value: 'EUR', flag: '🇪🇺' },
-  { label: 'GBP', value: 'GBP', flag: '🇬🇧' },
-  { label: 'HKD', value: 'HKD', flag: '🇭🇰' },
-  { label: 'HUF', value: 'HUF', flag: '🇭🇺' },
-  { label: 'IDR', value: 'IDR', flag: '🇮🇩' },
-  { label: 'INR', value: 'INR', flag: '🇮🇳' },
-  { label: 'JPY', value: 'JPY', flag: '🇯🇵' },
-  { label: 'KRW', value: 'KRW', flag: '🇰🇷' },
-  { label: 'MXN', value: 'MXN', flag: '🇲🇽' },
-  { label: 'MYR', value: 'MYR', flag: '🇲🇾' },
-  { label: 'NOK', value: 'NOK', flag: '🇳🇴' },
-  { label: 'NZD', value: 'NZD', flag: '🇳🇿' },
-  { label: 'PHP', value: 'PHP', flag: '🇵🇭' },
-  { label: 'PLN', value: 'PLN', flag: '🇵🇱' },
-  { label: 'QAR', value: 'QAR', flag: '🇶🇦' },
-  { label: 'RUB', value: 'RUB', flag: '🇷🇺' },
-  { label: 'SAR', value: 'SAR', flag: '🇸🇦' },
-  { label: 'SEK', value: 'SEK', flag: '🇸🇪' },
-  { label: 'SGD', value: 'SGD', flag: '🇸🇬' },
-  { label: 'THB', value: 'THB', flag: '🇹🇭' },
-  { label: 'TRY', value: 'TRY', flag: '🇹🇷' },
-  { label: 'TWD', value: 'TWD', flag: '🇹🇼' },
-  { label: 'USD', value: 'USD', flag: '🇺🇸' },
-  { label: 'VND', value: 'VND', flag: '🇻🇳' },
-  { label: 'ZAR', value: 'ZAR', flag: '🇿🇦' },
+  { label: 'AED', value: 'AED', flag: '🇦🇪', country: 'United Arab Emirates', aliases: ['UAE', 'Emirates'] },
+  { label: 'AUD', value: 'AUD', flag: '🇦🇺', country: 'Australia', aliases: [] },
+  { label: 'BRL', value: 'BRL', flag: '🇧🇷', country: 'Brazil', aliases: [] },
+  { label: 'CAD', value: 'CAD', flag: '🇨🇦', country: 'Canada', aliases: [] },
+  { label: 'CHF', value: 'CHF', flag: '🇨🇭', country: 'Switzerland', aliases: ['Swiss'] },
+  { label: 'CNY', value: 'CNY', flag: '🇨🇳', country: 'China', aliases: ['RMB', "Renminbi", 'PRC', 'CN'] },
+  { label: 'CZK', value: 'CZK', flag: '🇨🇿', country: 'Czech Republic', aliases: ['Czechia'] },
+  { label: 'DKK', value: 'DKK', flag: '🇩🇰', country: 'Denmark', aliases: [] },
+  { label: 'EUR', value: 'EUR', flag: '🇪🇺', country: 'Eurozone', aliases: ['European Union', 'EU', 'Europe'] },
+  { label: 'GBP', value: 'GBP', flag: '🇬🇧', country: 'United Kingdom', aliases: ['UK', 'Britain', 'Great Britain', 'England'] },
+  { label: 'HKD', value: 'HKD', flag: '🇭🇰', country: 'Hong Kong', aliases: [] },
+  { label: 'HUF', value: 'HUF', flag: '🇭🇺', country: 'Hungary', aliases: [] },
+  { label: 'IDR', value: 'IDR', flag: '🇮🇩', country: 'Indonesia', aliases: [] },
+  { label: 'INR', value: 'INR', flag: '🇮🇳', country: 'India', aliases: [] },
+  { label: 'JPY', value: 'JPY', flag: '🇯🇵', country: 'Japan', aliases: [] },
+  { label: 'KRW', value: 'KRW', flag: '🇰🇷', country: 'South Korea', aliases: ['Korea', 'Republic of Korea'] },
+  { label: 'MXN', value: 'MXN', flag: '🇲🇽', country: 'Mexico', aliases: [] },
+  { label: 'MYR', value: 'MYR', flag: '🇲🇾', country: 'Malaysia', aliases: [] },
+  { label: 'NOK', value: 'NOK', flag: '🇳🇴', country: 'Norway', aliases: [] },
+  { label: 'NZD', value: 'NZD', flag: '🇳🇿', country: 'New Zealand', aliases: ['NZ'] },
+  { label: 'PHP', value: 'PHP', flag: '🇵🇭', country: 'Philippines', aliases: [] },
+  { label: 'PLN', value: 'PLN', flag: '🇵🇱', country: 'Poland', aliases: [] },
+  { label: 'QAR', value: 'QAR', flag: '🇶🇦', country: 'Qatar', aliases: [] },
+  { label: 'RUB', value: 'RUB', flag: '🇷🇺', country: 'Russia', aliases: ['Russian Federation'] },
+  { label: 'SAR', value: 'SAR', flag: '🇸🇦', country: 'Saudi Arabia', aliases: [] },
+  { label: 'SEK', value: 'SEK', flag: '🇸🇪', country: 'Sweden', aliases: [] },
+  { label: 'SGD', value: 'SGD', flag: '🇸🇬', country: 'Singapore', aliases: [] },
+  { label: 'THB', value: 'THB', flag: '🇹🇭', country: 'Thailand', aliases: [] },
+  { label: 'TRY', value: 'TRY', flag: '🇹🇷', country: 'Turkey', aliases: ['Türkiye'] },
+  { label: 'TWD', value: 'TWD', flag: '🇹🇼', country: 'Taiwan', aliases: ['Republic of China', 'ROC'] },
+  { label: 'USD', value: 'USD', flag: '🇺🇸', country: 'United States', aliases: ['USA', 'US', 'America'] },
+  { label: 'VND', value: 'VND', flag: '🇻🇳', country: 'Vietnam', aliases: [] },
+  { label: 'ZAR', value: 'ZAR', flag: '🇿🇦', country: 'South Africa', aliases: [] },
 ];
 
 const CRYPTO_CURRENCIES = [
@@ -134,6 +134,12 @@ interface CurrencyRow {
 }
 
 const CurrencyConverter = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('fiat');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTermCrypto, setSearchTermCrypto] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
   // Simple formatter for display
   const formatDisplay = (value: number) => {
@@ -167,34 +173,60 @@ const CurrencyConverter = () => {
     const [activeTab, setActiveTab] = useState<'fiat' | 'crypto'>('fiat');
     const [searchTerm, setSearchTerm] = useState('');
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const [dropdownPosition, setDropdownPosition] = useState<{ left: number; top: number; width: number }>({ left: 0, top: 0, width: 0 });
 
     // Handle clicks outside dropdown
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        const targetNode = event.target as Node;
+        const clickedInsideDropdown = dropdownRef.current?.contains(targetNode);
+        const clickedTrigger = triggerRef.current?.contains(targetNode);
+        if (!clickedInsideDropdown && !clickedTrigger) {
           setIsOpen(false);
         }
       };
 
+      const updatePosition = () => {
+        if (!triggerRef.current) return;
+        const rect = triggerRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          left: Math.round(rect.left),
+          top: Math.round(rect.bottom),
+          width: Math.round(rect.width),
+        });
+      };
+
       if (isOpen) {
         document.addEventListener('mousedown', handleClickOutside);
+        window.addEventListener('scroll', updatePosition, true);
+        window.addEventListener('resize', updatePosition);
+        updatePosition();
       }
 
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('scroll', updatePosition, true);
+        window.removeEventListener('resize', updatePosition);
       };
     }, [isOpen]);
 
+    const normalize = (s: string) => s.toLowerCase();
+    const term = normalize(searchTerm);
+    const includesSearch = (code: string, country?: string, aliases?: string[]) => {
+      if (!term) return true;
+      if (normalize(code).includes(term)) return true;
+      if (country && normalize(country).includes(term)) return true;
+      if (aliases && aliases.some(a => normalize(a).includes(term))) return true;
+      return false;
+    };
+
     const availableFiat = FIAT_CURRENCIES.filter(c => 
       c.value === value || !rows.some(r => r.currency === c.value)
-    ).filter(c => 
-      c.label.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ).filter(c => includesSearch(c.label, c.country, c.aliases));
     const availableCrypto = CRYPTO_CURRENCIES.filter(c => 
       c.value === value || !rows.some(r => r.currency === c.value)
-    ).filter(c => 
-      c.label.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ).filter(c => normalize(c.label).includes(term));
 
     return (
       <Box style={{ position: 'relative' }}>
@@ -206,7 +238,14 @@ const CurrencyConverter = () => {
         
         {/* Trigger Button */}
         <Box
-          onClick={() => setIsOpen(!isOpen)}
+          ref={triggerRef}
+          onClick={() => {
+            if (isMobile) {
+              setIsModalOpen(true);
+            } else {
+              setIsOpen(!isOpen);
+            }
+          }}
           style={{
             ...styles?.input,
             cursor: 'pointer',
@@ -232,25 +271,26 @@ const CurrencyConverter = () => {
           />
         </Box>
 
-        {/* Dropdown with Tabs */}
+        {/* Dropdown with Tabs (rendered in portal to avoid clipping) */}
         {isOpen && (
-          <Box
-            ref={dropdownRef}
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              zIndex: 1000,
-              background: '#000000',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '8px',
-              marginTop: '4px',
-              maxHeight: '300px',
-              overflow: 'hidden',
-            }}
-          >
-            <Tabs value={activeTab} onChange={(val) => setActiveTab(val as 'fiat' | 'crypto')}>
+          <Portal>
+            <Box
+              ref={dropdownRef}
+              style={{
+                position: 'fixed',
+                top: `${dropdownPosition.top}px`,
+                left: `${dropdownPosition.left}px`,
+                width: `${dropdownPosition.width}px`,
+                zIndex: 1000,
+                background: '#000000',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '8px',
+                marginTop: '4px',
+                maxHeight: '300px',
+                overflow: 'hidden',
+              }}
+            >
+              <Tabs value={activeTab} onChange={(val) => setActiveTab(val as 'fiat' | 'crypto')}>
               <Tabs.List style={{ 
                 background: 'rgba(255, 255, 255, 0.05)', 
                 border: 'none',
@@ -413,8 +453,8 @@ const CurrencyConverter = () => {
                     <input
                       type="text"
                       placeholder="Search"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                      value={searchTermCrypto}
+                      onChange={(e) => setSearchTermCrypto(e.target.value)}
                       style={{
                         width: '100%',
                         background: '#000000',
@@ -467,8 +507,230 @@ const CurrencyConverter = () => {
                   })}
                 </Stack>
               </Tabs.Panel>
-            </Tabs>
-          </Box>
+              </Tabs>
+            </Box>
+          </Portal>
+        )}
+
+        {/* Mobile Bottom Sheet Drawer */}
+        {isMobile && (
+          <Drawer
+            opened={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            position="bottom"
+            size="100%"
+            overlayProps={{ opacity: 0.25, blur: 0 }}
+            styles={{
+              content: {
+                background: '#000000',
+                borderTopLeftRadius: '16px',
+                borderTopRightRadius: '16px',
+              }
+            }}
+          >
+            <Box style={{ 
+              background: '#000000', 
+              height: '70vh',
+              borderRadius: '16px 16px 0 0',
+              padding: '20px 0 0 0'
+            }}>
+              <Box style={{
+                width: '40px',
+                height: '4px',
+                background: 'rgba(255, 255, 255, 0.3)',
+                borderRadius: '2px',
+                margin: '0 auto 20px auto'
+              }} />
+              <Tabs value={activeTab} onChange={(val) => setActiveTab(val as 'fiat' | 'crypto')}>
+                <Tabs.List style={{ 
+                  background: 'rgba(255, 255, 255, 0.05)', 
+                  border: 'none',
+                  justifyContent: 'center',
+                  display: 'flex'
+                }}>
+                  <Tabs.Tab 
+                    value="fiat" 
+                    style={{ 
+                      color: activeTab === 'fiat' ? '#00ffff' : 'rgba(255, 255, 255, 0.6)', 
+                      fontSize: '1rem',
+                      padding: '12px 16px',
+                      background: 'transparent',
+                      border: 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Fiat
+                  </Tabs.Tab>
+                  <Tabs.Tab 
+                    value="crypto" 
+                    style={{ 
+                      color: activeTab === 'crypto' ? '#00ffff' : 'rgba(255, 255, 255, 0.6)', 
+                      fontSize: '1rem',
+                      padding: '12px 16px',
+                      background: 'transparent',
+                      border: 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Crypto
+                  </Tabs.Tab>
+                </Tabs.List>
+
+                <Tabs.Panel value="fiat" style={{ 
+                  padding: '0', 
+                  maxHeight: 'calc(70vh - 70px)', 
+                  overflowY: 'scroll',
+                }} className="always-visible-scrollbar">
+                  <Stack gap={0}>
+                    <Box
+                      style={{
+                        position: 'sticky',
+                        top: 0,
+                        background: '#000000',
+                        zIndex: 10,
+                        padding: '12px 12px 8px 12px',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                      }}
+                    >
+                      <IconSearch 
+                        size={16} 
+                        style={{ 
+                          position: 'absolute', 
+                          left: '12px', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          color: 'rgba(255, 255, 255, 0.6)',
+                          zIndex: 1
+                        }} 
+                      />
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{
+                          width: '100%',
+                          background: '#0a0a0a',
+                          border: '1px solid rgba(255, 255, 255, 0.3)',
+                          borderRadius: '6px',
+                          padding: '10px 12px 10px 36px',
+                          fontSize: '1rem',
+                          color: '#ffffff',
+                          outline: 'none'
+                        }}
+                      />
+                    </Box>
+                    {availableFiat.map((currency) => (
+                      <Box
+                        key={currency.value}
+                        onClick={() => {
+                          onChange(currency.value);
+                          setIsModalOpen(false);
+                        }}
+                        style={{
+                          padding: '14px 16px',
+                          cursor: 'pointer',
+                          color: '#ffffff',
+                          fontSize: '1rem',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        <Text style={{ fontSize: '1.2rem' }}>{currency.flag}</Text>
+                        {currency.label}
+                      </Box>
+                    ))}
+                  </Stack>
+                </Tabs.Panel>
+
+                <Tabs.Panel value="crypto" style={{ 
+                  padding: '0', 
+                  maxHeight: 'calc(70vh - 70px)', 
+                  overflowY: 'scroll',
+                }} className="always-visible-scrollbar">
+                  <Stack gap={0}>
+                    <Box
+                      style={{
+                        position: 'sticky',
+                        top: 0,
+                        background: '#000000',
+                        zIndex: 10,
+                        padding: '12px 12px 8px 12px',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                      }}
+                    >
+                      <IconSearch 
+                        size={16} 
+                        style={{ 
+                          position: 'absolute', 
+                          left: '12px', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          color: 'rgba(255, 255, 255, 0.6)',
+                          zIndex: 1
+                        }} 
+                      />
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        value={searchTermCrypto}
+                        onChange={(e) => setSearchTermCrypto(e.target.value)}
+                        style={{
+                          width: '100%',
+                          background: '#0a0a0a',
+                          border: '1px solid rgba(255, 255, 255, 0.3)',
+                          borderRadius: '6px',
+                          padding: '10px 12px 10px 36px',
+                          fontSize: '1rem',
+                          color: '#ffffff',
+                          outline: 'none'
+                        }}
+                      />
+                    </Box>
+                    {availableCrypto.map((currency) => {
+                      const IconComponent = currency.icon;
+                      return (
+                        <Box
+                          key={currency.value}
+                          onClick={() => {
+                            onChange(currency.value);
+                            setIsModalOpen(false);
+                          }}
+                          style={{
+                            padding: '14px 16px',
+                            cursor: 'pointer',
+                            color: '#ffffff',
+                            fontSize: '1rem',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(0, 255, 255, 0.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          <IconComponent size={18} style={{ color: '#ff00ff' }} />
+                          {currency.label}
+                        </Box>
+                      );
+                    })}
+                  </Stack>
+                </Tabs.Panel>
+              </Tabs>
+            </Box>
+          </Drawer>
         )}
       </Box>
     );
@@ -599,9 +861,29 @@ const CurrencyConverter = () => {
 
   const handleCurrencyChange = (value: string | null, index: number) => {
     if (!value) return;
+    console.log('handleCurrencyChange called with:', { value, index, currentRows: rows });
+    
+    // Create a copy of the current rows
     const newRows = [...rows];
+    
+    // Store the current amount for this row
+    const currentAmount = newRows[index].amount;
+    
+    // Update the currency
     newRows[index] = { ...newRows[index], currency: value };
-    setRows(updateConversions(newRows));
+    
+    console.log('Before update - row at index', index, ':', newRows[index]);
+    console.log('After update - row at index', index, ':', newRows[index]);
+    console.log('All new rows:', newRows);
+    
+    // If this is not the base currency (index > 0), preserve the amount
+    if (index > 0) {
+      // Keep the amount the same, just update the currency
+      setRows(newRows);
+    } else {
+      // For base currency, recalculate all conversions
+      setRows(updateConversions(newRows));
+    }
   };
 
   const addCurrency = () => {
@@ -652,7 +934,7 @@ const CurrencyConverter = () => {
   const scrollableCurrencies = additionalCurrencies.slice(4);
 
     return (
-    <Box style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box className="panel panel-currency-converter" style={{ height: '100%', display: 'flex', flexDirection: 'column', maxWidth: '420px', width: '100%' }}>
       <Box style={{ ...containerStyles, height: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Base Currency - Always fixed at top */}
         <Group key={baseCurrency.id} style={{...rowStyles, marginBottom: '16px'}} align="flex-end">
@@ -738,7 +1020,7 @@ const CurrencyConverter = () => {
               {/* All Additional Currencies */}
               {additionalCurrencies.map((row, index) => (
                 <Group 
-                  key={row.id} 
+                  key={`currency-row-${index + 1}`} 
                   style={rowStyles} 
                   align="flex-end"
                 >
@@ -746,7 +1028,19 @@ const CurrencyConverter = () => {
                     <CurrencySelector
                       placeholder="Select currency"
                       value={row.currency}
-                      onChange={(value) => handleCurrencyChange(value, index + 1)}
+                      onChange={(value) => {
+                        console.log('CurrencySelector onChange:', { 
+                          rowCurrency: row.currency, 
+                          newValue: value, 
+                          index: index, 
+                          actualRowIndex: index + 1,
+                          rowId: row.id
+                        });
+                        // Since additionalCurrencies is rows.slice(1), the actual index is index + 1
+                        const actualIndex = index + 1;
+                        console.log('Using actual index:', actualIndex);
+                        handleCurrencyChange(value, actualIndex);
+                      }}
                       styles={inputStyles}
                     />
                   </Box>

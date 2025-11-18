@@ -312,13 +312,13 @@ const App = () => {
 
               {/* Tab Content */}
               {activeTab === 'converter' && (
-                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
+                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto', display: 'flex', justifyContent: 'center' }}>
                   <CurrencyConverter />
                 </Box>
               )}
               
               {activeTab === 'calculator' && (
-                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
+                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto', display: 'flex', justifyContent: 'center' }}>
                   <Calculator 
                     onHistoryUpdate={setCalculatorHistory} 
                     selectedExpression={selectedHistoryExpression}
@@ -328,7 +328,7 @@ const App = () => {
               )}
               
               {activeTab === 'history' && (
-                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto' }}>
+                <Box style={{ width: '100%', minHeight: '400px', overflow: 'auto', display: 'flex', justifyContent: 'center' }}>
                   <HistoryPanel 
                     history={calculatorHistory} 
                     onHistoryClick={handleHistoryClick}

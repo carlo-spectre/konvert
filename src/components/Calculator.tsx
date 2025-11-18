@@ -210,6 +210,7 @@ const Calculator = ({ onHistoryUpdate, selectedExpression, onExpressionSelected 
 
   return (
     <Box
+      className="panel panel-calculator"
       ref={calculatorRef}
       tabIndex={0}
       onFocus={() => setIsFocused(true)}
@@ -221,6 +222,7 @@ const Calculator = ({ onHistoryUpdate, selectedExpression, onExpressionSelected 
         padding: '24px',
         border: '1px solid rgba(255,255,255,0.1)',
         width: '100%',
+        maxWidth: '420px',
         height: '100%',
         outline: 'none',
         transition: 'all 0.3s ease',
